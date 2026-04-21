@@ -66,6 +66,19 @@ src/
 └── middleware.ts           # Supabase 세션 갱신
 ```
 
+## 배포
+
+Cloudflare Workers + OpenNext로 배포합니다. 상세 절차는 [`docs/DEPLOY.md`](./docs/DEPLOY.md) 참조.
+
+```bash
+# WSL/Linux/macOS 에서
+wrangler login
+wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+wrangler secret put CRAWLER_TOKEN
+wrangler secret put NEXT_PUBLIC_SUPABASE_ANON_KEY
+npm run deploy
+```
+
 ## 참고
 
 전체 제품 기획·로드맵·수익 모델은 [`PROJECT.md`](./PROJECT.md) 참조.
