@@ -1,0 +1,46 @@
+/**
+ * biomice · Cloudflare Workers 배포 설정
+ * OpenNext Cloudflare 어댑터가 만든 .open-next/worker.js 를 실행합니다.
+ *
+ * 운영 환경변수는 `wrangler secret put` 또는 Cloudflare 대시보드에서 주입:
+ *   - NEXT_PUBLIC_SUPABASE_URL
+ *   - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ *   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+ *   - SUPABASE_SERVICE_ROLE_KEY
+ *   - CRAWLER_TOKEN
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "biomice",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-04-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  /**
+   * ISR / Data Cache — OpenNext가 KV 또는 R2를 사용하도록 설정할 수 있습니다.
+   * 지금은 기본(in-memory + 요청 간 재검증)으로 두고, 트래픽 늘면 KV 바인딩 추가.
+   *
+   * 크롤러 Cron Trigger는 별도 Worker(workers/cron.ts)로 분리했습니다.
+   * OpenNext는 `fetch` 핸들러만 export하므로 cron은 같은 파일에 둘 수 없습니다.
+   */
+
+  /**
+   * 공용 환경 변수 — 이곳에 둔 값은 빌드에 포함되며 누구나 볼 수 있습니다.
+   * 민감한 키(SUPABASE_SERVICE_ROLE_KEY, CRAWLER_TOKEN)는 여기 두지 말고
+   * `wrangler secret put NAME` 으로 주입하세요.
+   */
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://vmbctjfygimsbirlsaxk.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_cFeGnZPq1UJJnInGOPtq_g_PjqQMvWX"
+  }
+}

@@ -1,0 +1,27 @@
+/**
+ * biomice 크롤러 Cron Worker 설정 (메인 앱과 분리)
+ *
+ * 배포:
+ *   wrangler deploy --config workers/wrangler.cron.jsonc
+ *
+ * 시크릿 주입:
+ *   wrangler secret put CRAWLER_TOKEN --config workers/wrangler.cron.jsonc
+ */
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "biomice-cron",
+  "main": "cron.ts",
+  "compatibility_date": "2026-04-01",
+
+  "triggers": {
+    "crons": ["0 18 * * *"]
+  },
+
+  "vars": {
+    "BIOMICE_ORIGIN": "https://biomice.kr"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
