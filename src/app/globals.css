@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/* ────────────────────────────────────────────────────────────
+   biomice — design tokens (CSS variables)
+   Ported from uiux/components.jsx · v1
+   ──────────────────────────────────────────────────────────── */
+
+:root {
+  /* Primary — 의료계 신뢰감 블루 */
+  --bm-primary: #1A6FAA;
+  --bm-primary-hover: #155A8C;
+  --bm-primary-active: #10456E;
+  --bm-primary-subtle: #E8F1F9;
+  --bm-primary-subtle-hover: #D4E5F2;
+
+  /* Surface */
+  --bm-bg: #FFFFFF;
+  --bm-bg-muted: #F5F5F5;
+  --bm-surface: #FFFFFF;
+  --bm-surface-hover: #FAFAFA;
+
+  /* Text */
+  --bm-text-primary: #2C2C2C;
+  --bm-text-secondary: #5A5A5A;
+  --bm-text-tertiary: #8A8A8A;
+  --bm-text-inverse: #FFFFFF;
+
+  /* Accent — Featured 앰버 */
+  --bm-accent: #B46A1A;
+  --bm-accent-subtle: #FDF3E4;
+  --bm-accent-border: #E8C48A;
+
+  /* Border */
+  --bm-border: #E5E5E5;
+  --bm-border-strong: #CFCFCF;
+
+  /* Semantic */
+  --bm-success: #2E8B57;
+  --bm-success-subtle: #E6F4EC;
+  --bm-danger: #C73E3E;
+  --bm-danger-subtle: #FCEAEA;
+  --bm-warning: #D4871A;
+  --bm-warning-subtle: #FDF1DE;
+
+  /* Favorite */
+  --bm-favorite: #E05151;
+
+  /* Radius */
+  --bm-radius-input: 4px;
+  --bm-radius-button: 6px;
+  --bm-radius-card: 8px;
+  --bm-radius-pill: 999px;
+}
+
+html[data-theme="dark"] {
+  --bm-primary: #4A9BD4;
+  --bm-primary-hover: #6AB0E0;
+  --bm-primary-active: #88C2E8;
+  --bm-primary-subtle: #16283A;
+  --bm-primary-subtle-hover: #1E3A54;
+
+  --bm-bg: #0F1216;
+  --bm-bg-muted: #1A1F25;
+  --bm-surface: #171C22;
+  --bm-surface-hover: #1F252D;
+
+  --bm-text-primary: #E8EAED;
+  --bm-text-secondary: #A0A6AD;
+  --bm-text-tertiary: #6E757D;
+  --bm-text-inverse: #0F1216;
+
+  --bm-accent: #D9993E;
+  --bm-accent-subtle: #2E230F;
+  --bm-accent-border: #5A4518;
+
+  --bm-border: #2A3038;
+  --bm-border-strong: #3D454F;
+
+  --bm-success: #4CAE7A;
+  --bm-success-subtle: #14291E;
+  --bm-danger: #E06868;
+  --bm-danger-subtle: #2E1616;
+  --bm-warning: #E0A14A;
+  --bm-warning-subtle: #2D2008;
+
+  --bm-favorite: #E87070;
+}
+
+@theme inline {
+  --color-background: var(--bm-bg);
+  --color-foreground: var(--bm-text-primary);
+  --color-primary: var(--bm-primary);
+  --color-accent: var(--bm-accent);
+  --color-border: var(--bm-border);
+  --color-muted: var(--bm-bg-muted);
+  --color-surface: var(--bm-surface);
+  --font-sans: "Pretendard Variable", Pretendard, "Noto Sans KR", -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--bm-bg);
+  color: var(--bm-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes bm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bm-border);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bm-border-strong);
+}
