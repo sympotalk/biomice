@@ -11,18 +11,21 @@ import {
   listUpcomingConferences,
   getSpecialtyCounts,
   getBannerForSlot,
+  getMyBookmarkIds,
 } from "@/lib/queries";
 
-export const revalidate = 300; // ISR: refresh home every 5 min
+// Per-user bookmark state means we can't statically cache this page.
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, thisWeek, upcoming, specialtyCounts, banner] =
+  const [featured, thisWeek, upcoming, specialtyCounts, banner, bookmarkedIds] =
     await Promise.all([
       listFeaturedConferences(6),
       listThisWeekConferences(8),
       listUpcomingConferences(12),
       getSpecialtyCounts(),
       getBannerForSlot("main_top"),
+      getMyBookmarkIds(),
     ]);
 
   const topSpecialties = specialtyCounts.slice(0, 8).map((s) => s.category);
@@ -54,7 +57,7 @@ export default async function HomePage() {
               caption="주목할 만한 학술대회"
               actionHref="/conferences?view=featured"
             />
-            <ConferenceGrid conferences={featured} />
+            <ConferenceGrid conferences={featured} bookmarkedIds={bookmarkedIds} />
           </section>
         )}
 
@@ -66,7 +69,7 @@ export default async function HomePage() {
             actionHref="/conferences?view=upcoming"
           />
           {thisWeek.length > 0 ? (
-            <ConferenceGrid conferences={thisWeek} scroll />
+            <ConferenceGrid conferences={thisWeek} scroll bookmarkedIds={bookmarkedIds} />
           ) : (
             <EmptyState
               title="이번 주 예정된 학술대회가 없습니다"
@@ -83,7 +86,7 @@ export default async function HomePage() {
             actionHref="/conferences"
           />
           {upcoming.length > 0 ? (
-            <ConferenceGrid conferences={upcoming} />
+            <ConferenceGrid conferences={upcoming} bookmarkedIds={bookmarkedIds} />
           ) : (
             <EmptyState />
           )}

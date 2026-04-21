@@ -2,7 +2,7 @@ import { HeaderServer as Header } from "@/components/layout/HeaderServer";
 import { Footer } from "@/components/layout/Footer";
 import { LoginForm } from "./LoginForm";
 
-type SearchParams = Promise<{ "check-email"?: string }>;
+type SearchParams = Promise<{ "check-email"?: string; next?: string }>;
 
 export default async function LoginPage({
   searchParams,
@@ -22,7 +22,10 @@ export default async function LoginPage({
           padding: "48px 20px",
         }}
       >
-        <LoginForm checkEmail={sp["check-email"] === "1"} />
+        <LoginForm
+          checkEmail={sp["check-email"] === "1"}
+          next={sp.next}
+        />
       </main>
       <Footer />
     </>

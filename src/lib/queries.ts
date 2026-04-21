@@ -114,6 +114,50 @@ export async function getConference(id: number): Promise<Conference | null> {
   return data;
 }
 
+/**
+ * Fetch the set of bookmarked conference ids for the current user.
+ * Returns an empty Set when the user is signed out.
+ */
+export async function getMyBookmarkIds(): Promise<Set<number>> {
+  const sb = await createServerClient();
+  const { data: auth } = await sb.auth.getUser();
+  if (!auth.user) return new Set();
+  const { data, error } = await sb
+    .from("bookmarks")
+    .select("conference_id")
+    .eq("user_id", auth.user.id);
+  if (error) return new Set();
+  return new Set((data ?? []).map((r) => r.conference_id));
+}
+
+/** Fetch the full list of a user's bookmarked conferences (newest first). */
+export async function getMyBookmarkedConferences(): Promise<Conference[]> {
+  const sb = await createServerClient();
+  const { data: auth } = await sb.auth.getUser();
+  if (!auth.user) return [];
+  const { data, error } = await sb
+    .from("bookmarks")
+    .select("created_at, conferences(*)")
+    .eq("user_id", auth.user.id)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? [])
+    .map((r) => r.conferences as unknown as Conference | null)
+    .filter((c): c is Conference => c != null);
+}
+
+export async function getMyProfile() {
+  const sb = await createServerClient();
+  const { data: auth } = await sb.auth.getUser();
+  if (!auth.user) return null;
+  const { data } = await sb
+    .from("users_profile")
+    .select("*")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  return { user: auth.user, profile: data };
+}
+
 export async function getBannerForSlot(slotName: string): Promise<Banner | null> {
   const sb = await createServerClient();
   const { data, error } = await sb
