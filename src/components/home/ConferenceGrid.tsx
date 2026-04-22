@@ -5,9 +5,10 @@ import type { Conference } from "@/lib/database.types";
 type Props = {
   conferences: Conference[];
   scroll?: boolean;
+  bookmarkedIds?: Set<number>;
 };
 
-export function ConferenceGrid({ conferences, scroll }: Props) {
+export function ConferenceGrid({ conferences, scroll, bookmarkedIds }: Props) {
   if (scroll) {
     return (
       <div
@@ -20,11 +21,11 @@ export function ConferenceGrid({ conferences, scroll }: Props) {
         }}
       >
         {conferences.map((c) => (
-          <div
-            key={c.id}
-            style={{ flexShrink: 0, width: 280 }}
-          >
-            <CardFromRow conference={c} />
+          <div key={c.id} style={{ flexShrink: 0, width: 280 }}>
+            <CardFromRow
+              conference={c}
+              bookmarked={bookmarkedIds?.has(c.id) ?? false}
+            />
           </div>
         ))}
       </div>
@@ -40,13 +41,23 @@ export function ConferenceGrid({ conferences, scroll }: Props) {
       }}
     >
       {conferences.map((c) => (
-        <CardFromRow key={c.id} conference={c} />
+        <CardFromRow
+          key={c.id}
+          conference={c}
+          bookmarked={bookmarkedIds?.has(c.id) ?? false}
+        />
       ))}
     </div>
   );
 }
 
-function CardFromRow({ conference: c }: { conference: Conference }) {
+function CardFromRow({
+  conference: c,
+  bookmarked,
+}: {
+  conference: Conference;
+  bookmarked: boolean;
+}) {
   return (
     <ConferenceCard
       id={c.id}
@@ -61,6 +72,7 @@ function CardFromRow({ conference: c }: { conference: Conference }) {
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
       logoText={societyShort(c.society_name)}
+      favorite={bookmarked}
     />
   );
 }

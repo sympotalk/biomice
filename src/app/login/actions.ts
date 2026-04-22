@@ -5,12 +5,20 @@ import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string } | null;
 
+function safeNext(raw: FormDataEntryValue | null): string {
+  const value = typeof raw === "string" ? raw : "";
+  // Only allow same-origin relative redirects.
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  return "/";
+}
+
 export async function loginAction(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const next = safeNext(formData.get("next"));
 
   if (!email || !password) {
     return { error: "이메일과 비밀번호를 입력해 주세요." };
@@ -22,7 +30,7 @@ export async function loginAction(
     return { error: translateAuthError(error.message) };
   }
 
-  redirect("/");
+  redirect(next);
 }
 
 export async function signupAction(
@@ -58,6 +66,8 @@ export async function signupAction(
     return { error: translateAuthError(error.message) };
   }
 
+  const next = safeNext(formData.get("next"));
+
   // Create profile row if we have a user id and session (no email confirmation required).
   if (data.user && data.session) {
     await sb.from("users_profile").upsert(
@@ -69,7 +79,7 @@ export async function signupAction(
       },
       { onConflict: "id" },
     );
-    redirect("/");
+    redirect(next);
   }
 
   // Email confirmation is required; route back to login with a hint.

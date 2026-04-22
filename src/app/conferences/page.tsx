@@ -10,10 +10,11 @@ import {
   listConferences,
   getSpecialtyCounts,
   getBannerForSlot,
+  getMyBookmarkIds,
 } from "@/lib/queries";
 import Link from "next/link";
 
-export const revalidate = 180;
+export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 12;
 
@@ -35,7 +36,7 @@ export default async function ConferencesListPage({
   const category = sp.category?.trim() || undefined;
   const featured = sp.view === "featured";
 
-  const [{ rows, total }, categories, sideBanner] = await Promise.all([
+  const [{ rows, total }, categories, sideBanner, bookmarkedIds] = await Promise.all([
     listConferences({
       q,
       category,
@@ -45,6 +46,7 @@ export default async function ConferencesListPage({
     }),
     getSpecialtyCounts(),
     getBannerForSlot("list_sidebar"),
+    getMyBookmarkIds(),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -102,7 +104,7 @@ export default async function ConferencesListPage({
         >
           <div>
             {rows.length > 0 ? (
-              <ConferenceGrid conferences={rows} />
+              <ConferenceGrid conferences={rows} bookmarkedIds={bookmarkedIds} />
             ) : (
               <EmptyState
                 title="조건에 맞는 학술대회가 없습니다"

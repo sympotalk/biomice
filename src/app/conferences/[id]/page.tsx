@@ -14,7 +14,8 @@ import {
   ExternalIcon,
   PinIcon,
 } from "@/components/ui/Icon";
-import { getConference, getBannerForSlot } from "@/lib/queries";
+import { getConference, getBannerForSlot, getMyBookmarkIds } from "@/lib/queries";
+import { FavoriteHeart } from "@/components/ui/FavoriteHeart";
 import {
   computeDDay,
   formatKoreanDate,
@@ -22,7 +23,7 @@ import {
 } from "@/lib/dates";
 import type { Metadata } from "next";
 
-export const revalidate = 180;
+export const dynamic = "force-dynamic";
 
 type Params = Promise<{ id: string }>;
 
@@ -47,11 +48,13 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
   const numId = Number(id);
   if (!Number.isFinite(numId)) notFound();
 
-  const [conf, bottomBanner] = await Promise.all([
+  const [conf, bottomBanner, bookmarkedIds] = await Promise.all([
     getConference(numId),
     getBannerForSlot("detail_bottom"),
+    getMyBookmarkIds(),
   ]);
   if (!conf) notFound();
+  const isBookmarked = bookmarkedIds.has(numId);
 
   const dd = computeDDay(conf.start_date);
   const regOpen = isRegistrationOpen(conf.start_date, conf.registration_url);
@@ -108,6 +111,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
         {/* Header card */}
         <section
           style={{
+            position: "relative",
             background: conf.is_featured
               ? "linear-gradient(135deg, var(--bm-accent-subtle) 0%, var(--bm-bg) 80%)"
               : "var(--bm-surface)",
@@ -119,6 +123,10 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             marginBottom: 24,
           }}
         >
+          <div style={{ position: "absolute", top: 20, right: 20 }}>
+            <FavoriteHeart active={isBookmarked} conferenceId={conf.id} size={40} />
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -126,6 +134,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               alignItems: "center",
               marginBottom: 12,
               flexWrap: "wrap",
+              paddingRight: 48,
             }}
           >
             {conf.is_featured && <FeaturedBadge variant="featured" />}
@@ -245,6 +254,11 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 </Button>
               </a>
             )}
+            <a href={`/api/ics/${conf.id}`} download>
+              <Button variant="outline" size="lg">
+                .ics 캘린더 추가
+              </Button>
+            </a>
             {conf.society_url && (
               <a
                 href={conf.society_url}

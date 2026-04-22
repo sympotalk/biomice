@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/Button";
 import { AuthCard, AuthField } from "@/components/auth/AuthCard";
 import { loginAction, type AuthState } from "./actions";
 
-export function LoginForm({ checkEmail }: { checkEmail?: boolean }) {
+export function LoginForm({
+  checkEmail,
+  next,
+}: {
+  checkEmail?: boolean;
+  next?: string;
+}) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     loginAction,
     null,
@@ -14,6 +20,7 @@ export function LoginForm({ checkEmail }: { checkEmail?: boolean }) {
 
   return (
     <form action={formAction}>
+      {next && <input type="hidden" name="next" value={next} />}
       <AuthCard
         title="biomice 로그인"
         caption="의학 학술대회 정보를 한 곳에서"

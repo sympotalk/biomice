@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type MouseEvent } from "react";
+import { useState } from "react";
 import { CalendarIcon, PinIcon } from "./Icon";
 import { DDayBadge, FeaturedBadge, RegistrationOpenBadge } from "./Badge";
 import { FavoriteHeart } from "./FavoriteHeart";
 import { radius } from "@/lib/tokens";
 
 export type ConferenceCardProps = {
-  id: number | string;
+  id: number;
   title: string;
   society: string;
   startDate: string; // "2026.05.14" formatted
@@ -20,7 +20,6 @@ export type ConferenceCardProps = {
   featured?: boolean;
   registrationOpen?: boolean;
   favorite?: boolean;
-  onFav?: (e: MouseEvent<HTMLButtonElement>) => void;
   compact?: boolean;
   logoText?: string;
   logoColor?: string;
@@ -40,7 +39,6 @@ export function ConferenceCard({
   featured,
   registrationOpen,
   favorite,
-  onFav,
   compact,
   logoText,
   logoColor,
@@ -90,7 +88,7 @@ export function ConferenceCard({
           {!featured && registrationOpen && <RegistrationOpenBadge />}
         </div>
         <div style={{ position: "absolute", top: 8, right: 8 }}>
-          <FavoriteHeart active={favorite} onClick={onFav} size={32} />
+          <FavoriteHeart active={favorite} conferenceId={id} size={32} />
         </div>
         <div
           style={{
