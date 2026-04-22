@@ -8,8 +8,8 @@ function getResend() {
   return _resend;
 }
 
-const FROM = "biomice <noreply@biomice.kr>";
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://biomice.kr";
+const FROM = "biomice <noreply@biomice.xyz>";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://biomice.xyz";
 
 export type SendResult = { ok: true } | { ok: false; error: string };
 
