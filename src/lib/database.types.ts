@@ -103,6 +103,7 @@ export type Database = {
           is_featured: boolean
           kams_id: string | null
           registration_url: string | null
+          society_id: number | null
           society_name: string
           society_url: string | null
           sponsor_id: number | null
@@ -124,6 +125,7 @@ export type Database = {
           is_featured?: boolean
           kams_id?: string | null
           registration_url?: string | null
+          society_id?: number | null
           society_name: string
           society_url?: string | null
           sponsor_id?: number | null
@@ -145,6 +147,7 @@ export type Database = {
           is_featured?: boolean
           kams_id?: string | null
           registration_url?: string | null
+          society_id?: number | null
           society_name?: string
           society_url?: string | null
           sponsor_id?: number | null
@@ -153,7 +156,15 @@ export type Database = {
           venue?: string | null
           view_count?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conferences_society_id_fkey"
+            columns: ["society_id"]
+            isOneToOne: false
+            referencedRelation: "societies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_log: {
         Row: {
@@ -186,6 +197,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      societies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: number
+          is_verified: boolean
+          logo_url: string | null
+          name: string
+          slug: string
+          specialty: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          is_verified?: boolean
+          logo_url?: string | null
+          name: string
+          slug: string
+          specialty?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          is_verified?: boolean
+          logo_url?: string | null
+          name?: string
+          slug?: string
+          specialty?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      sponsors: {
+        Row: {
+          company_name: string
+          contact_email: string
+          created_at: string
+          id: number
+          is_active: boolean
+          logo_url: string | null
+          user_id: string | null
+          website_url: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          logo_url?: string | null
+          user_id?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          logo_url?: string | null
+          user_id?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
       }
       users_profile: {
         Row: {
@@ -237,3 +320,5 @@ export type Banner = Database["public"]["Tables"]["banners"]["Row"]
 export type Bookmark = Database["public"]["Tables"]["bookmarks"]["Row"]
 export type UsersProfile = Database["public"]["Tables"]["users_profile"]["Row"]
 export type NotificationLog = Database["public"]["Tables"]["notification_log"]["Row"]
+export type Society = Database["public"]["Tables"]["societies"]["Row"]
+export type Sponsor = Database["public"]["Tables"]["sponsors"]["Row"]
