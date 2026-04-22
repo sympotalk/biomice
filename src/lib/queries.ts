@@ -47,7 +47,6 @@ export async function listUpcomingConferences(limit = 12): Promise<Conference[]>
 
 export async function getSpecialtyCounts(): Promise<{ category: string; count: number }[]> {
   const sb = await createServerClient();
-  // Pull future conferences and aggregate in JS (works around limited select RPC).
   const { data, error } = await sb
     .from("conferences")
     .select("category")
@@ -63,9 +62,31 @@ export async function getSpecialtyCounts(): Promise<{ category: string; count: n
     .sort((a, b) => b.count - a.count);
 }
 
+export async function getCityCounts(): Promise<{ city: string; count: number }[]> {
+  const sb = await createServerClient();
+  const { data, error } = await sb
+    .from("conferences")
+    .select("city")
+    .gte("start_date", today())
+    .not("city", "is", null);
+  if (error) throw error;
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    if (!row.city) continue;
+    counts.set(row.city, (counts.get(row.city) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([city, count]) => ({ city, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 12);
+}
+
 export async function listConferences(params: {
   q?: string;
   category?: string;
+  city?: string;
+  dateFrom?: string; // YYYY-MM-DD
+  dateTo?: string;   // YYYY-MM-DD
   featured?: boolean;
   page?: number;
   pageSize?: number;
@@ -83,16 +104,25 @@ export async function listConferences(params: {
     .order("start_date", { ascending: true })
     .range(fromIdx, toIdx);
 
-  if (params.from !== "all") {
+  // 날짜 범위 — dateFrom/dateTo가 있으면 그것을 우선, 없으면 upcoming 처리
+  if (params.dateFrom) {
+    query = query.gte("start_date", params.dateFrom);
+  } else if (params.from !== "all") {
     query = query.gte("start_date", today());
   }
+  if (params.dateTo) {
+    query = query.lte("start_date", params.dateTo);
+  }
+
   if (params.q) {
     const q = params.q.replace(/,/g, " ").trim();
-    // Search event_name OR society_name (case-insensitive)
     query = query.or(`event_name.ilike.%${q}%,society_name.ilike.%${q}%`);
   }
   if (params.category) {
     query = query.eq("category", params.category);
+  }
+  if (params.city) {
+    query = query.eq("city", params.city);
   }
   if (params.featured) {
     query = query.eq("is_featured", true);
@@ -101,6 +131,26 @@ export async function listConferences(params: {
   const { data, count, error } = await query;
   if (error) throw error;
   return { rows: data ?? [], total: count ?? 0 };
+}
+
+/** 캘린더 뷰용: 특정 월의 모든 학술대회 (페이지네이션 없음) */
+export async function listConferencesForMonth(
+  year: number,
+  month: number, // 1-12
+): Promise<Conference[]> {
+  const sb = await createServerClient();
+  const from = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+  const { data, error } = await sb
+    .from("conferences")
+    .select("*")
+    .gte("start_date", from)
+    .lte("start_date", to)
+    .order("start_date", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
 }
 
 export async function getConference(id: number): Promise<Conference | null> {
