@@ -36,11 +36,12 @@
 
   /**
    * 공용 환경 변수 — 이곳에 둔 값은 빌드에 포함되며 누구나 볼 수 있습니다.
-   * 민감한 키(SUPABASE_SERVICE_ROLE_KEY, CRAWLER_TOKEN)는 여기 두지 말고
+   * 민감한 키(SUPABASE_SERVICE_ROLE_KEY, CRAWLER_TOKEN, RESEND_API_KEY)는 여기 두지 말고
    * `wrangler secret put NAME` 으로 주입하세요.
    */
   "vars": {
     "NEXT_PUBLIC_SUPABASE_URL": "https://vmbctjfygimsbirlsaxk.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_cFeGnZPq1UJJnInGOPtq_g_PjqQMvWX"
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_cFeGnZPq1UJJnInGOPtq_g_PjqQMvWX",
+    "NEXT_PUBLIC_APP_URL": "https://biomice.xyz"
   }
 }

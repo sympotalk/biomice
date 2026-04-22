@@ -14,11 +14,14 @@
   "compatibility_date": "2026-04-01",
 
   "triggers": {
-    "crons": ["0 18 * * *"]
+    "crons": [
+      "0 18 * * *",
+      "0 0 * * *"
+    ]
   },
 
   "vars": {
-    "BIOMICE_ORIGIN": "https://biomice.kr"
+    "BIOMICE_ORIGIN": "https://biomice.xyz"
   },
 
   "observability": {
