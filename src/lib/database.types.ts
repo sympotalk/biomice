@@ -155,11 +155,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          conference_id: number
+          days_before: number
+          id: number
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          conference_id: number
+          days_before: number
+          id?: number
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          conference_id?: number
+          days_before?: number
+          id?: number
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_conference_id_fkey"
+            columns: ["conference_id"]
+            isOneToOne: false
+            referencedRelation: "conferences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users_profile: {
         Row: {
           created_at: string
           id: string
           newsletter_opt_in: boolean
+          notify_days: number[]
+          notify_enabled: boolean
           organization: string | null
           specialty: string | null
           updated_at: string
@@ -169,6 +203,8 @@ export type Database = {
           created_at?: string
           id: string
           newsletter_opt_in?: boolean
+          notify_days?: number[]
+          notify_enabled?: boolean
           organization?: string | null
           specialty?: string | null
           updated_at?: string
@@ -178,6 +214,8 @@ export type Database = {
           created_at?: string
           id?: string
           newsletter_opt_in?: boolean
+          notify_days?: number[]
+          notify_enabled?: boolean
           organization?: string | null
           specialty?: string | null
           updated_at?: string
@@ -198,3 +236,4 @@ export type ConferenceInsert = Database["public"]["Tables"]["conferences"]["Inse
 export type Banner = Database["public"]["Tables"]["banners"]["Row"]
 export type Bookmark = Database["public"]["Tables"]["bookmarks"]["Row"]
 export type UsersProfile = Database["public"]["Tables"]["users_profile"]["Row"]
+export type NotificationLog = Database["public"]["Tables"]["notification_log"]["Row"]

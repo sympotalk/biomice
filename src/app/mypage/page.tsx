@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ConferenceGrid } from "@/components/home/ConferenceGrid";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
+import { NotifySettings } from "./NotifySettings";
 import { getMyProfile, getMyBookmarkedConferences } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -111,6 +112,12 @@ export default async function MyPage() {
             )}
           </div>
         </section>
+
+        {/* Notification Settings */}
+        <NotifySettings
+          enabled={me.profile?.notify_enabled ?? true}
+          days={(me.profile?.notify_days as number[] | null) ?? [7, 1]}
+        />
 
         {/* Bookmarks */}
         <section>
