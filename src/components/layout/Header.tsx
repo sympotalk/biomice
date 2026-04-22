@@ -79,6 +79,12 @@ export function Header({ userEmail }: Props) {
           <Link href="/conferences?view=featured" style={navLinkStyle}>
             Featured
           </Link>
+          <Link href="/societies" style={navLinkStyle}>
+            학회
+          </Link>
+          <Link href="/pharma" style={{ ...navLinkStyle, color: "var(--bm-accent)" }}>
+            제약사
+          </Link>
         </nav>
 
         <div style={{ flex: 1, maxWidth: 340 }} className="hidden md:block">
@@ -155,6 +161,16 @@ export function Header({ userEmail }: Props) {
             onClick={() => setOpen(false)}
           >
             Featured
+          </Link>
+          <Link href="/societies" style={navLinkStyle} onClick={() => setOpen(false)}>
+            학회
+          </Link>
+          <Link
+            href="/pharma"
+            style={{ ...navLinkStyle, color: "var(--bm-accent)" }}
+            onClick={() => setOpen(false)}
+          >
+            제약사
           </Link>
           {userEmail ? (
             <div style={{ marginTop: 4 }}>

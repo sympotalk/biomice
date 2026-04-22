@@ -1,6 +1,6 @@
 import { addDays, formatISO } from "date-fns";
 import { createClient as createServerClient } from "./supabase/server";
-import type { Conference, Banner } from "./database.types";
+import type { Conference, Banner, Society } from "./database.types";
 
 const today = () => formatISO(new Date(), { representation: "date" });
 
@@ -156,6 +156,64 @@ export async function getMyProfile() {
     .eq("id", auth.user.id)
     .maybeSingle();
   return { user: auth.user, profile: data };
+}
+
+// ─── Societies ────────────────────────────────────────────────────────────────
+
+export type SocietyWithCount = Society & { conference_count: number };
+
+export async function listSocieties(): Promise<SocietyWithCount[]> {
+  const sb = await createServerClient();
+  // conferences 테이블에서 society_id별 카운트를 집계
+  const { data: counts } = await sb
+    .from("conferences")
+    .select("society_id")
+    .not("society_id", "is", null)
+    .gte("start_date", today());
+
+  const countMap = new Map<number, number>();
+  for (const row of counts ?? []) {
+    if (row.society_id == null) continue;
+    countMap.set(row.society_id, (countMap.get(row.society_id) ?? 0) + 1);
+  }
+
+  const { data, error } = await sb
+    .from("societies")
+    .select("*")
+    .order("name", { ascending: true });
+  if (error) throw error;
+
+  return (data ?? []).map((s) => ({
+    ...s,
+    conference_count: countMap.get(s.id) ?? 0,
+  }));
+}
+
+export async function getSocietyBySlug(slug: string): Promise<Society | null> {
+  const sb = await createServerClient();
+  const { data, error } = await sb
+    .from("societies")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getSocietyConferences(
+  societyId: number,
+  from: "upcoming" | "all" = "upcoming",
+): Promise<Conference[]> {
+  const sb = await createServerClient();
+  let query = sb
+    .from("conferences")
+    .select("*")
+    .eq("society_id", societyId)
+    .order("start_date", { ascending: true });
+  if (from === "upcoming") query = query.gte("start_date", today());
+  const { data, error } = await query;
+  if (error) throw error;
+  return data ?? [];
 }
 
 export async function getBannerForSlot(slotName: string): Promise<Banner | null> {
