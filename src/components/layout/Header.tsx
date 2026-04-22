@@ -8,6 +8,8 @@ import { CloseIcon, MenuIcon } from "@/components/ui/Icon";
 import { useRouter } from "next/navigation";
 import { UserMenu } from "./UserMenu";
 
+const ADMIN_EMAILS = ["sympotalk@gmail.com"];
+
 type Props = {
   userEmail?: string | null;
 };
@@ -15,6 +17,7 @@ type Props = {
 export function Header({ userEmail }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const isAdmin = ADMIN_EMAILS.includes((userEmail ?? "").toLowerCase());
 
   const submit = (q: string) => {
     const url = q.trim()
@@ -85,6 +88,22 @@ export function Header({ userEmail }: Props) {
           <Link href="/pharma" style={{ ...navLinkStyle, color: "var(--bm-accent)" }}>
             제약사
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              style={{
+                ...navLinkStyle,
+                fontSize: 12,
+                fontWeight: 600,
+                color: "var(--bm-text-tertiary)",
+                border: "1px solid var(--bm-border)",
+                padding: "3px 10px",
+                borderRadius: 4,
+              }}
+            >
+              관리자
+            </Link>
+          )}
         </nav>
 
         <div style={{ flex: 1, maxWidth: 340 }} className="hidden md:block">

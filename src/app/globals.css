@@ -123,6 +123,18 @@ body {
   }
 }
 
+/* Admin nav link hover */
+.admin-nav-link:hover {
+  background: var(--bm-primary-subtle);
+  color: var(--bm-primary);
+}
+
+/* Card hover utility */
+.card-hover:hover {
+  border-color: var(--bm-primary) !important;
+  box-shadow: 0 2px 8px rgba(26, 111, 170, 0.1);
+}
+
 /* Scrollbar polish */
 ::-webkit-scrollbar {
   width: 10px;
