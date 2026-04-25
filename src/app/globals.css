@@ -135,6 +135,102 @@ body {
   box-shadow: 0 2px 8px rgba(26, 111, 170, 0.1);
 }
 
+/* ── 학회 목록 그리드 ──────────────────────────────────────────────────────── */
+.bm-society-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* ── 학술대회 상세 2단 레이아웃 ──────────────────────────────────────────── */
+.bm-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── 학술대회 목록 사이드바 레이아웃 ─────────────────────────────────────── */
+.bm-list-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ── 태블릿 (≤1024px) ────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .bm-society-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .bm-detail-grid {
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+  }
+}
+
+/* ── 학술대회 목록 hero bar ────────────────────────────────────────────────── */
+.bm-list-hero {
+  border-bottom: 1px solid var(--bm-border);
+  background: var(--bm-bg);
+  padding: 20px 24px;
+}
+
+/* ── 모바일 (≤768px) ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* 학회 그리드: 2열 */
+  .bm-society-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* 상세 페이지: 1열 스택 */
+  .bm-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  /* 사이드바 sticky 해제 */
+  .bm-detail-grid > aside {
+    position: static !important;
+  }
+
+  /* 목록 페이지 사이드바 레이아웃 스택 */
+  .bm-list-layout {
+    flex-direction: column;
+  }
+
+  /* 상단 hero bar 패딩 줄이기 */
+  .bm-hero-bar {
+    padding: 16px 16px 14px;
+  }
+
+  /* detail/list page 내부 여백 줄이기 */
+  .bm-detail-grid {
+    padding: 20px 16px 48px !important;
+  }
+  .bm-detail-hero .bm-inner,
+  .bm-detail-grid .bm-inner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* 카드 제목 폰트 줄이기 */
+  .bm-detail-hero h1 {
+    font-size: 22px !important;
+  }
+
+  /* 학회 상세 */
+  .bm-list-layout > * {
+    width: 100%;
+  }
+}
+
+/* ── 소형 모바일 (≤480px) ────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .bm-society-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Scrollbar polish */
 ::-webkit-scrollbar {
   width: 10px;

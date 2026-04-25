@@ -204,13 +204,7 @@ export default async function ConferencesListPage({
           </div>
         ) : (
           /* 일반 뷰 — sidebar + content */
-          <div
-            style={{
-              display: "flex",
-              gap: 24,
-              alignItems: "flex-start",
-            }}
-          >
+          <div className="bm-list-layout">
             {/* 사이드바 필터 (데스크톱) */}
             <div className="hidden md:block">
               <ListSidebar

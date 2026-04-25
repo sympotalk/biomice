@@ -61,6 +61,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section
+        className="bm-detail-hero"
         style={{
           background: conf.is_featured
             ? "linear-gradient(180deg, var(--bm-accent-subtle) 0%, var(--bm-bg) 100%)"
@@ -227,14 +228,11 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
 
       {/* ── 2-column body ────────────────────────────────────────────────── */}
       <div
+        className="bm-detail-grid"
         style={{
           maxWidth: 1280,
           margin: "0 auto",
           padding: "32px 24px 64px",
-          display: "grid",
-          gridTemplateColumns: "1fr 340px",
-          gap: 32,
-          alignItems: "start",
         }}
       >
         {/* ── Left column ─────────────────────────────────────────────────── */}
@@ -316,6 +314,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             gap: 16,
           }}
         >
+
           {/* CTA card */}
           <div
             style={{
