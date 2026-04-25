@@ -4,8 +4,8 @@ import { ConferenceGrid } from "@/components/home/ConferenceGrid";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { AdBanner } from "@/components/ui/AdBanner";
-import { FilterPanel } from "@/components/conferences/FilterPanel";
 import { ListSidebar } from "@/components/conferences/ListSidebar";
+import { MobileFilterToolbar } from "@/components/conferences/MobileFilterToolbar";
 import { PaginationClient } from "@/components/conferences/PaginationClient";
 import { ViewToggle } from "@/components/conferences/ViewToggle";
 import { CalendarView } from "@/components/conferences/CalendarView";
@@ -212,25 +212,15 @@ export default async function ConferencesListPage({
 
             {/* 콘텐츠 */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              {/* 모바일용 축약 필터 (md 미만에서만 보임) */}
-              <div
-                className="bm-show-mobile"
-                style={{
-                  background: "var(--bm-surface)",
-                  border: "1px solid var(--bm-border)",
-                  borderRadius: 8,
-                  padding: "12px 14px",
-                  marginBottom: 14,
-                }}
-              >
-                <FilterPanel
-                  categories={categories}
-                  cities={cities}
-                  currentCategory={category}
-                  currentCity={city}
-                  currentDate={date}
-                />
-              </div>
+              {/* 모바일용 sticky 검색·필터 toolbar + 바텀시트 */}
+              <MobileFilterToolbar
+                categories={categories}
+                cities={cities}
+                currentCategory={category}
+                currentCity={city}
+                currentDate={date}
+                total={total}
+              />
 
               {rows.length > 0 ? (
                 <>

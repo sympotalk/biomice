@@ -17,12 +17,12 @@ function SocietyLogo({ name, logoUrl }: { name: string; logoUrl?: string | null 
         alt=""
         onError={() => setErr(true)}
         style={{
-          width: 56,
-          height: 56,
-          borderRadius: 10,
+          width: 44,
+          height: 44,
+          borderRadius: 8,
           objectFit: "contain",
           background: "#fff",
-          padding: 5,
+          padding: 4,
           border: "1px solid var(--bm-border)",
           flexShrink: 0,
         }}
@@ -33,18 +33,18 @@ function SocietyLogo({ name, logoUrl }: { name: string; logoUrl?: string | null 
   return (
     <div
       style={{
-        width: 56,
-        height: 56,
-        borderRadius: 10,
+        width: 44,
+        height: 44,
+        borderRadius: 8,
         background: "var(--bm-primary-subtle)",
         color: "var(--bm-primary)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 800,
         flexShrink: 0,
-        letterSpacing: -0.5,
+        letterSpacing: -0.3,
       }}
     >
       {initials}
@@ -135,21 +135,30 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
           </span>
           {s.conference_count > 0 ? (
             <span
+              className="mono-num"
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 700,
-                color: "#fff",
-                background: "var(--bm-primary)",
-                padding: "2px 10px",
-                borderRadius: 999,
-                fontFamily: "var(--font-mono)",
+                color: "var(--bm-primary)",
               }}
             >
-              {s.conference_count}건
+              예정 {s.conference_count}건
             </span>
           ) : (
-            <span style={{ fontSize: 12, color: "var(--bm-text-tertiary)" }}>없음</span>
+            <span style={{ fontSize: 11, color: "var(--bm-text-tertiary)" }}>없음</span>
           )}
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            style={{ color: "var(--bm-text-tertiary)" }}
+          >
+            <path d="M4 2l4 4-4 4" />
+          </svg>
         </div>
       </div>
     </Link>

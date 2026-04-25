@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { CloseIcon, MenuIcon } from "@/components/ui/Icon";
+import { CloseIcon, MenuIcon, SearchIcon } from "@/components/ui/Icon";
 import { useRouter } from "next/navigation";
 import { UserMenu } from "./UserMenu";
 
@@ -138,27 +138,59 @@ export function Header({ userEmail }: Props) {
             )}
           </div>
 
-          {/* Mobile hamburger (always pushed to right) */}
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-label="메뉴 열기"
+          {/* Mobile right group: 검색 → 햄버거 */}
+          <div
             className="bm-show-mobile-flex"
-            style={{
-              marginLeft: "auto",
-              width: 40,
-              height: 40,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--bm-text-primary)",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 0,
-            }}
+            style={{ marginLeft: "auto", gap: 0, alignItems: "center" }}
           >
-            <MenuIcon />
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(true);
+                // 드로어 열고 검색 입력에 자동 포커스 — 작은 트릭
+                setTimeout(() => {
+                  const el = document.querySelector<HTMLInputElement>(
+                    ".bm-drawer input[type='text']",
+                  );
+                  el?.focus();
+                }, 240);
+              }}
+              aria-label="검색"
+              style={{
+                width: 44,
+                height: 44,
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                color: "var(--bm-text-primary)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+              }}
+            >
+              <SearchIcon width={20} height={20} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="메뉴 열기"
+              style={{
+                width: 44,
+                height: 44,
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                color: "var(--bm-text-primary)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+              }}
+            >
+              <MenuIcon width={22} height={22} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -219,73 +251,59 @@ export function Header({ userEmail }: Props) {
 
               {/* Nav links */}
               <div className="bm-drawer-section-title">메뉴</div>
-              <Link
+              <DrawerLink
                 href="/conferences"
-                className="bm-drawer-link"
+                label="학술대회"
+                sub="전체 목록"
                 onClick={() => setOpen(false)}
-              >
-                <span>학술대회</span>
-                <Chevron />
-              </Link>
-              <Link
+              />
+              <DrawerLink
                 href="/conferences?view=upcoming"
-                className="bm-drawer-link"
+                label="이번 주"
+                sub="D-7 이내"
                 onClick={() => setOpen(false)}
-              >
-                <span>이번 주</span>
-                <Chevron />
-              </Link>
-              <Link
+              />
+              <DrawerLink
                 href="/conferences?view=featured"
-                className="bm-drawer-link"
+                label="Featured"
+                sub="주요 학술대회"
                 onClick={() => setOpen(false)}
-              >
-                <span>Featured</span>
-                <Chevron />
-              </Link>
-              <Link
+              />
+              <DrawerLink
                 href="/societies"
-                className="bm-drawer-link"
+                label="학회"
+                sub="국내 의학회"
                 onClick={() => setOpen(false)}
-              >
-                <span>학회</span>
-                <Chevron />
-              </Link>
-              <Link
+              />
+              <DrawerLink
                 href="/pharma"
-                className="bm-drawer-link"
+                label="제약사"
+                sub="광고 문의"
                 onClick={() => setOpen(false)}
-                style={{ color: "var(--bm-accent)" }}
-              >
-                <span>제약사</span>
-                <Chevron />
-              </Link>
+                accent
+              />
 
               {isAdmin && (
                 <>
                   <div className="bm-drawer-section-title">관리</div>
-                  <Link
+                  <DrawerLink
                     href="/admin"
-                    className="bm-drawer-link"
+                    label="관리자 대시보드"
+                    sub="배너·학술대회 CRUD"
                     onClick={() => setOpen(false)}
-                  >
-                    <span>관리자 대시보드</span>
-                    <Chevron />
-                  </Link>
+                  />
                 </>
               )}
 
               {userEmail && (
                 <>
                   <div className="bm-drawer-section-title">내 계정</div>
-                  <Link
+                  <DrawerLink
                     href="/mypage"
-                    className="bm-drawer-link"
+                    label="마이페이지"
+                    sub="즐겨찾기·알림 설정"
                     onClick={() => setOpen(false)}
-                  >
-                    <span>마이페이지</span>
-                    <Chevron />
-                  </Link>
+                  />
                 </>
               )}
             </div>
@@ -332,6 +350,47 @@ function Chevron() {
     >
       <polyline points="6 4 10 8 6 12" />
     </svg>
+  );
+}
+
+function DrawerLink({
+  href,
+  label,
+  sub,
+  onClick,
+  accent,
+}: {
+  href: string;
+  label: string;
+  sub: string;
+  onClick: () => void;
+  accent?: boolean;
+}) {
+  return (
+    <Link href={href} className="bm-drawer-link" onClick={onClick}>
+      <div>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: accent ? "var(--bm-accent)" : "var(--bm-text-primary)",
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: "var(--bm-text-tertiary)",
+            marginTop: 2,
+            fontWeight: 400,
+          }}
+        >
+          {sub}
+        </div>
+      </div>
+      <Chevron />
+    </Link>
   );
 }
 

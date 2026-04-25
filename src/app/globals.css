@@ -149,24 +149,26 @@ html, body {
    Use these instead of `hidden md:flex` etc.
    ════════════════════════════════════════════════════════════ */
 
-/* Mobile-first: visible on mobile, hidden on desktop */
-.bm-show-mobile { display: block; }
-.bm-show-mobile-flex { display: flex; }
-.bm-show-mobile-inline { display: inline-flex; }
+/* Mobile-first: visible on mobile, hidden on desktop.
+   !important is intentional — these are utility visibility classes that must
+   win over component layout classes like `bm-card-grid`/`bm-scroll-row`. */
+.bm-show-mobile { display: block !important; }
+.bm-show-mobile-flex { display: flex !important; }
+.bm-show-mobile-inline { display: inline-flex !important; }
 
 /* Mobile-first: hidden on mobile, visible on desktop */
 .bm-show-desktop,
 .bm-show-desktop-flex,
-.bm-show-desktop-inline { display: none; }
+.bm-show-desktop-inline { display: none !important; }
 
 @media (min-width: 768px) {
   .bm-show-mobile,
   .bm-show-mobile-flex,
-  .bm-show-mobile-inline { display: none; }
+  .bm-show-mobile-inline { display: none !important; }
 
-  .bm-show-desktop { display: block; }
-  .bm-show-desktop-flex { display: flex; }
-  .bm-show-desktop-inline { display: inline-flex; }
+  .bm-show-desktop { display: block !important; }
+  .bm-show-desktop-flex { display: flex !important; }
+  .bm-show-desktop-inline { display: inline-flex !important; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -267,6 +269,131 @@ html, body {
   border-bottom: 1px solid var(--bm-border);
   background: var(--bm-bg);
   padding: 20px 24px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   HERO TYPO + SECTION HEADER
+   ════════════════════════════════════════════════════════════ */
+
+.bm-hero-h1 {
+  font-size: clamp(22px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  line-height: 1.25;
+}
+
+.bm-hero-search-wrap {
+  width: 100%;
+  max-width: 640px;
+}
+
+.bm-hero-search {
+  height: 56px;
+}
+
+/* 모바일에서 진료과 칩이 여러 줄로 늘어나지 않게 가로 스크롤 */
+.bm-hero-chips {
+  margin-top: 16px;
+}
+.bm-hero-chips-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 섹션 헤더 */
+.bm-section-h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--bm-text-primary);
+}
+.bm-section-caption {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--bm-text-tertiary);
+}
+
+/* ════════════════════════════════════════════════════════════
+   STICKY CTA (모바일 하단 고정)
+   ════════════════════════════════════════════════════════════ */
+
+.bm-sticky-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bm-bg);
+  border-top: 1px solid var(--bm-border);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* sticky CTA가 콘텐츠를 가리지 않도록 모바일 detail 페이지에 하단 spacer */
+@media (max-width: 768px) {
+  .bm-detail-grid {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOTTOM SHEET
+   ════════════════════════════════════════════════════════════ */
+
+.bm-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 60;
+  animation: bm-fade-in .15s ease-out;
+}
+.bm-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  background: var(--bm-bg);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  max-height: 82dvh;
+  display: flex;
+  flex-direction: column;
+  animation: bm-slide-up .22s cubic-bezier(.2,.9,.2,1);
+}
+.bm-sheet-handle {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+.bm-sheet-handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bm-border-strong);
+}
+
+@keyframes bm-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   FOOTER
+   ════════════════════════════════════════════════════════════ */
+
+.bm-footer-desktop {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 32px;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -434,6 +561,38 @@ html, body {
   /* Hero 검색바 높이 축소 */
   .bm-hero-search {
     height: 48px;
+  }
+
+  /* Hero h1 모바일에서 더 컴팩트하게 */
+  .bm-hero-h1 {
+    font-size: 24px;
+    line-height: 1.25;
+  }
+
+  /* 진료과 칩 — 모바일은 가로 스크롤 (한 줄 유지) */
+  .bm-hero-chips {
+    margin-left: -14px;
+    margin-right: -14px;
+    padding: 0 14px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+  .bm-hero-chips::-webkit-scrollbar {
+    display: none;
+  }
+  .bm-hero-chips-inner {
+    display: inline-flex;
+    flex-wrap: nowrap;
+  }
+
+  /* 섹션 헤더 모바일 폰트 축소 */
+  .bm-section-h2 {
+    font-size: 17px;
+  }
+  .bm-section-caption {
+    font-size: 11px;
+    margin-top: 2px;
   }
 }
 

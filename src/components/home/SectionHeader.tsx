@@ -11,59 +11,41 @@ type Props = {
 export function SectionHeader({
   title,
   caption,
-  actionLabel = "전체 보기",
+  actionLabel = "더보기",
   actionHref,
 }: Props) {
   return (
     <div
+      className="bm-section-header"
       style={{
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "space-between",
-        marginBottom: 20,
+        marginBottom: 14,
         gap: 16,
       }}
     >
-      <div>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 22,
-            fontWeight: 700,
-            letterSpacing: -0.4,
-            color: "var(--bm-text-primary)",
-          }}
-        >
-          {title}
-        </h2>
-        {caption && (
-          <div
-            style={{
-              fontSize: 13,
-              color: "var(--bm-text-secondary)",
-              marginTop: 4,
-            }}
-          >
-            {caption}
-          </div>
-        )}
+      <div style={{ minWidth: 0 }}>
+        <h2 className="bm-section-h2">{title}</h2>
+        {caption && <div className="bm-section-caption">{caption}</div>}
       </div>
       {actionHref && (
         <Link
           href={actionHref}
           style={{
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: 500,
             color: "var(--bm-primary)",
             textDecoration: "none",
             display: "inline-flex",
             alignItems: "center",
-            gap: 4,
+            gap: 2,
             whiteSpace: "nowrap",
+            padding: "6px 0",
           }}
         >
           {actionLabel}
-          <ChevronRightIcon />
+          <ChevronRightIcon width={12} height={12} />
         </Link>
       )}
     </div>

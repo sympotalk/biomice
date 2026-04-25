@@ -9,6 +9,8 @@ type Props = {
   currentCategory?: string;
   currentCity?: string;
   currentDate?: string; // "this-month" | "next-month" | "3-months" | ""
+  /** 시트 안에서 사용할 때 하단의 중복 "초기화" 버튼 숨김 */
+  hideReset?: boolean;
 };
 
 const DATE_OPTIONS = [
@@ -24,6 +26,7 @@ export function FilterPanel({
   currentCategory,
   currentCity,
   currentDate,
+  hideReset,
 }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
@@ -115,7 +118,7 @@ export function FilterPanel({
       </div>
 
       {/* 필터 초기화 */}
-      {hasFilters && (
+      {hasFilters && !hideReset && (
         <div>
           <button
             type="button"

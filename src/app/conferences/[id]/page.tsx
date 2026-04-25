@@ -12,6 +12,7 @@ import {
 import { ExternalIcon } from "@/components/ui/Icon";
 import { getConference, getBannerForSlot, getMyBookmarkIds } from "@/lib/queries";
 import { FavoriteHeart } from "@/components/ui/FavoriteHeart";
+import { StickyDetailCTA } from "@/components/conferences/StickyDetailCTA";
 import {
   computeDDay,
   formatKoreanDate,
@@ -472,6 +473,13 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
       </div>
 
       <Footer />
+
+      {/* 모바일 하단 고정 CTA */}
+      <StickyDetailCTA
+        conferenceId={conf.id}
+        isBookmarked={isBookmarked}
+        registrationUrl={conf.registration_url}
+      />
     </>
   );
 }

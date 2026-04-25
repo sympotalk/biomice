@@ -54,18 +54,22 @@ export default async function HomePage() {
           <section className="bm-section">
             <SectionHeader
               title="Featured 학술대회"
-              caption="주목할 만한 학술대회"
+              caption="이달의 주요 일정"
               actionHref="/conferences?view=featured"
             />
-            <ConferenceGrid conferences={featured} bookmarkedIds={bookmarkedIds} />
+            <ConferenceGrid
+              conferences={featured}
+              mobileScroll
+              bookmarkedIds={bookmarkedIds}
+            />
           </section>
         )}
 
         {/* This week */}
         <section className="bm-section">
           <SectionHeader
-            title="이번 주 열리는 학술대회"
-            caption={`앞으로 7일 이내 · ${thisWeek.length}건`}
+            title="이번 주 열리는"
+            caption={`D-7 이내 · ${thisWeek.length}건`}
             actionHref="/conferences?view=upcoming"
           />
           {thisWeek.length > 0 ? (
@@ -82,7 +86,7 @@ export default async function HomePage() {
         <section className="bm-section-last">
           <SectionHeader
             title="다가오는 학술대회"
-            caption="가까운 일정순"
+            caption={`가까운 일정순 · ${upcoming.length}건`}
             actionHref="/conferences"
           />
           {upcoming.length > 0 ? (
