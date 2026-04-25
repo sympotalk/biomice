@@ -5,54 +5,26 @@ import type { Conference } from "@/lib/database.types";
 
 type Props = {
   conferences: Conference[];
-  /** 데스크톱·모바일 모두 가로 스크롤 스트립 (Featured/이번 주 등). */
+  /** 데스크톱에서만 가로 스크롤 스트립 (Featured/이번 주). 모바일은 자동으로 row 카드 stack. */
   scroll?: boolean;
-  /**
-   * 데스크톱은 그리드, 모바일은 가로 스크롤 (Featured에 좋음).
-   * scroll=true일 때는 무시됨.
-   */
-  mobileScroll?: boolean;
   bookmarkedIds?: Set<number>;
 };
 
-export function ConferenceGrid({
-  conferences,
-  scroll,
-  mobileScroll,
-  bookmarkedIds,
-}: Props) {
-  if (scroll) {
-    return (
-      <div className="bm-scroll-row">
-        {conferences.map((c) => (
-          <div key={c.id} className="bm-scroll-card">
-            <CardFromRow
-              conference={c}
-              bookmarked={bookmarkedIds?.has(c.id) ?? false}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (mobileScroll) {
-    return (
-      <>
-        {/* 데스크톱: 일반 그리드 */}
-        <div className="bm-show-desktop">
-          <div className="bm-card-grid">
-            {conferences.map((c) => (
-              <CardFromRow
-                key={c.id}
-                conference={c}
-                bookmarked={bookmarkedIds?.has(c.id) ?? false}
-              />
-            ))}
-          </div>
-        </div>
-        {/* 모바일: 가로 스크롤 (M2FeaturedScrollCard 형태) */}
-        <div className="bm-show-mobile">
+/**
+ * 학술대회 카드 그리드.
+ *
+ * 동작 원칙 (일관성):
+ *   - 모바일은 ★항상★ row 카드 1열 stack. 가로 스크롤 없음.
+ *   - 데스크톱은 props에 따라:
+ *     · scroll=true → 가로 스크롤 스트립 (Featured/이번 주)
+ *     · 기본 → 4-col grid
+ */
+export function ConferenceGrid({ conferences, scroll, bookmarkedIds }: Props) {
+  return (
+    <>
+      {/* ── 데스크톱 ───────────────────────────────────────────────────── */}
+      <div className="bm-show-desktop">
+        {scroll ? (
           <div className="bm-scroll-row">
             {conferences.map((c) => (
               <div key={c.id} className="bm-scroll-card">
@@ -63,25 +35,20 @@ export function ConferenceGrid({
               </div>
             ))}
           </div>
-        </div>
-      </>
-    );
-  }
-
-  // 데스크톱: 그리드 카드 / 모바일: 가로형 카드. CSS로 둘 중 하나만 보이게.
-  return (
-    <>
-      <div className="bm-show-desktop">
-        <div className="bm-card-grid">
-          {conferences.map((c) => (
-            <CardFromRow
-              key={c.id}
-              conference={c}
-              bookmarked={bookmarkedIds?.has(c.id) ?? false}
-            />
-          ))}
-        </div>
+        ) : (
+          <div className="bm-card-grid">
+            {conferences.map((c) => (
+              <CardFromRow
+                key={c.id}
+                conference={c}
+                bookmarked={bookmarkedIds?.has(c.id) ?? false}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* ── 모바일 ─────────────────────────────────────────────────────── */}
       <div className="bm-show-mobile">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {conferences.map((c) => (
@@ -152,7 +119,6 @@ function RowFromConf({
 }
 
 function societyShort(society: string): string {
-  // "대한내과학회" → "내과" → uppercase first 2 kanji/characters
   const cleaned = society.replace(/대한|학회|협회/g, "");
   return cleaned.slice(0, 2).toUpperCase();
 }

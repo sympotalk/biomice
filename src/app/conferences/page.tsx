@@ -73,13 +73,23 @@ export default async function ConferencesListPage({
   const date = sp.date?.trim() || undefined;
   const isCalendar = sp.view === "calendar";
   const isFeatured = sp.view === "featured";
+  const isUpcoming = sp.view === "upcoming";
 
   // 캘린더 뷰: 연/월 파라미터
   const now = new Date();
   const calYear = Number(sp.year) || now.getFullYear();
   const calMonth = Math.min(12, Math.max(1, Number(sp.month) || (now.getMonth() + 1)));
 
-  const { dateFrom, dateTo } = resolveDateRange(date);
+  // 일반 필터 → dateFrom/To
+  let { dateFrom, dateTo } = resolveDateRange(date);
+  // view=upcoming은 자동으로 오늘 ~ +7일 범위
+  if (isUpcoming && !dateFrom && !dateTo) {
+    const fmt = (d: Date) => formatISO(d, { representation: "date" });
+    const plus7 = new Date(now);
+    plus7.setDate(plus7.getDate() + 7);
+    dateFrom = fmt(now);
+    dateTo = fmt(plus7);
+  }
 
   const [{ rows, total }, categories, cities, sideBanner, bookmarkedIds] =
     await Promise.all([
@@ -110,6 +120,8 @@ export default async function ConferencesListPage({
 
   const title = isFeatured
     ? "Featured 학술대회"
+    : isUpcoming
+    ? "이번 주 학술대회"
     : q
     ? `"${q}" 검색 결과`
     : category

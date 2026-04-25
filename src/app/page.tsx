@@ -59,7 +59,7 @@ export default async function HomePage() {
             />
             <ConferenceGrid
               conferences={featured}
-              mobileScroll
+              scroll
               bookmarkedIds={bookmarkedIds}
             />
           </section>

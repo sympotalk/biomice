@@ -215,15 +215,10 @@ export function ConferenceCardRow({
           )}
           <span style={{ flex: 1 }} />
           <div
-            style={{
-              flexShrink: 0,
-              marginRight: -6,
-              marginTop: -8,
-              marginBottom: -8,
-            }}
+            style={{ flexShrink: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <FavoriteHeart active={favorite} conferenceId={id} size={32} />
+            <FavoriteHeart active={favorite} conferenceId={id} size={28} />
           </div>
         </div>
 

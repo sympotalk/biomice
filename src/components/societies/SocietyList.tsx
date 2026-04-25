@@ -58,16 +58,20 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
   const [hov, setHov] = useState(false);
 
   return (
-    <Link href={`/societies/${s.slug}`} style={{ textDecoration: "none", display: "flex" }}>
+    <Link
+      href={`/societies/${s.slug}`}
+      style={{ textDecoration: "none", display: "flex", minWidth: 0 }}
+    >
       <div
+        className="bm-society-card"
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{
           flex: 1,
+          minWidth: 0,
           background: "var(--bm-surface)",
           border: `1px solid ${hov ? "var(--bm-primary)" : "var(--bm-border)"}`,
           borderRadius: 12,
-          padding: "20px 18px 16px",
           display: "flex",
           flexDirection: "column",
           gap: 0,
@@ -80,12 +84,20 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
         }}
       >
         {/* Top: logo + name */}
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            alignItems: "flex-start",
+            marginBottom: 12,
+            minWidth: 0,
+          }}
+        >
           <SocietyLogo name={s.name} logoUrl={s.logo_url} />
           <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
             <div
               style={{
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: 700,
                 color: "var(--bm-text-primary)",
                 lineHeight: 1.35,
@@ -94,6 +106,7 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 marginBottom: 6,
+                wordBreak: "keep-all",
               }}
             >
               {s.name}
@@ -103,13 +116,13 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  height: 20,
-                  padding: "0 7px",
-                  fontSize: 11,
+                  height: 18,
+                  padding: "0 6px",
+                  fontSize: 10,
                   fontWeight: 600,
                   color: "var(--bm-primary)",
                   background: "var(--bm-primary-subtle)",
-                  borderRadius: 4,
+                  borderRadius: 3,
                 }}
               >
                 {s.specialty}

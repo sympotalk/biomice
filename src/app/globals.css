@@ -220,6 +220,9 @@ html, body {
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+.bm-society-card {
+  padding: 20px 18px 16px;
+}
 
 /* 학술대회 카드 그리드 (auto-responsive via minmax) */
 .bm-card-grid {
@@ -516,7 +519,10 @@ html, body {
   /* 학회 그리드: 2열 */
   .bm-society-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 8px;
+  }
+  .bm-society-card {
+    padding: 12px 12px 10px;
   }
 
   /* 카드 그리드: 2열 (auto-fill 무력화 — 좁은 폰에서 1열로 안 떨어지게) */
