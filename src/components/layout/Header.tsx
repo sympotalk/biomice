@@ -52,16 +52,14 @@ export function Header({ userEmail }: Props) {
         <Link
           href="/"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 22,
-            fontWeight: 800,
-            color: "var(--bm-primary)",
-            letterSpacing: -0.5,
             textDecoration: "none",
             flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          biomice
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="바이오마이스 BioMICE" height={36} style={{ display: "block" }} />
         </Link>
 
         <nav
