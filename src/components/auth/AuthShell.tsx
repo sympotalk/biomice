@@ -23,43 +23,9 @@ export function AuthShell({ children, width = 480 }: { children: ReactNode; widt
           flexShrink: 0,
         }}
       >
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            textDecoration: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 7,
-              background: "var(--bm-primary)",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-mono)",
-              fontWeight: 800,
-              fontSize: 14,
-            }}
-          >
-            b
-          </div>
-          <span
-            style={{
-              fontSize: 18,
-              fontWeight: 800,
-              color: "var(--bm-text-primary)",
-              fontFamily: "var(--font-mono)",
-              letterSpacing: -0.4,
-            }}
-          >
-            biomice
-          </span>
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="바이오마이스 BioMICE" height={36} style={{ display: "block" }} />
         </Link>
       </header>
 
@@ -85,7 +51,7 @@ export function AuthShell({ children, width = 480 }: { children: ReactNode; widt
           flexShrink: 0,
         }}
       >
-        © 2026 biomice · 데이터 출처: 대한의학회 (KAMS)
+        © 2026 BioMICE · 데이터 출처: 대한의학회 (KAMS)
       </footer>
     </div>
   );

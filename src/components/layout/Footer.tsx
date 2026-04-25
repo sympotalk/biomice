@@ -20,17 +20,8 @@ export function Footer() {
         }}
       >
         <div>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontWeight: 800,
-              fontSize: 20,
-              color: "var(--bm-primary)",
-              marginBottom: 8,
-            }}
-          >
-            biomice
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="바이오마이스 BioMICE" height={32} style={{ display: "block", marginBottom: 8 }} />
           <p
             style={{
               fontSize: 12,
@@ -66,7 +57,7 @@ export function Footer() {
         <FooterCol
           title="정보"
           links={[
-            { href: "/about", label: "biomice 소개" },
+            { href: "/about", label: "BioMICE 소개" },
             { href: "/advertise", label: "광고 문의" },
             { href: "/privacy", label: "개인정보 처리방침" },
             { href: "/terms", label: "이용약관" },
@@ -83,7 +74,7 @@ export function Footer() {
           color: "var(--bm-text-tertiary)",
         }}
       >
-        © {new Date().getFullYear()} biomice. 본 사이트의 학술대회 정보는 대한의학회(KAMS)
+        © {new Date().getFullYear()} BioMICE. 본 사이트의 학술대회 정보는 대한의학회(KAMS)
         공개자료를 기반으로 합니다.
       </div>
     </footer>

@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { AdBanner } from "@/components/ui/AdBanner";
 import { FilterPanel } from "@/components/conferences/FilterPanel";
+import { ListSidebar } from "@/components/conferences/ListSidebar";
 import { PaginationClient } from "@/components/conferences/PaginationClient";
 import { ViewToggle } from "@/components/conferences/ViewToggle";
 import { CalendarView } from "@/components/conferences/CalendarView";
@@ -16,7 +17,7 @@ import {
   getBannerForSlot,
   getMyBookmarkIds,
 } from "@/lib/queries";
-import { formatISO, addMonths, addDays } from "date-fns";
+import { formatISO, addMonths } from "date-fns";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -122,23 +123,31 @@ export default async function ConferencesListPage({
   return (
     <>
       <Header />
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 20px 64px" }}>
-        {/* 페이지 헤더 */}
+
+      {/* ── Hero bar ─────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          borderBottom: "1px solid var(--bm-border)",
+          background: "var(--bm-bg)",
+          padding: "20px 24px",
+        }}
+      >
         <div
           style={{
+            maxWidth: 1280,
+            margin: "0 auto",
             display: "flex",
-            alignItems: "flex-end",
+            alignItems: "center",
             justifyContent: "space-between",
-            marginBottom: 20,
-            flexWrap: "wrap",
             gap: 12,
+            flexWrap: "wrap",
           }}
         >
           <div>
             <h1
               style={{
                 margin: 0,
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight: 700,
                 letterSpacing: -0.4,
                 color: "var(--bm-text-primary)",
@@ -147,43 +156,22 @@ export default async function ConferencesListPage({
               {title}
             </h1>
             {!isCalendar && (
-              <div
-                style={{
-                  marginTop: 6,
-                  fontSize: 13,
-                  color: "var(--bm-text-secondary)",
-                }}
-              >
+              <div style={{ marginTop: 4, fontSize: 13, color: "var(--bm-text-secondary)" }}>
                 총 <span className="mono-num">{total}</span>건
               </div>
             )}
           </div>
-
-          {/* 뷰 토글 */}
           <ViewToggle current={isCalendar ? "calendar" : "grid"} />
         </div>
+      </div>
 
-        {/* 필터 패널 (캘린더 뷰에서도 표시) */}
-        {!isFeatured && (
-          <div
-            style={{
-              background: "var(--bm-surface)",
-              border: "1px solid var(--bm-border)",
-              borderRadius: 10,
-              padding: "16px 20px",
-              marginBottom: 24,
-            }}
-          >
-            <FilterPanel
-              categories={categories}
-              cities={cities}
-              currentCategory={category}
-              currentCity={city}
-              currentDate={date}
-            />
-          </div>
-        )}
-
+      <main
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "24px 20px 64px",
+        }}
+      >
         {/* 캘린더 뷰 */}
         {isCalendar ? (
           <CalendarView
@@ -192,18 +180,81 @@ export default async function ConferencesListPage({
             month={calMonth}
             bookmarkedIds={bookmarkedIds}
           />
+        ) : isFeatured ? (
+          /* Featured 뷰 — 사이드바 없이 전체 너비 */
+          <div>
+            {rows.length > 0 ? (
+              <ConferenceGrid conferences={rows} bookmarkedIds={bookmarkedIds} />
+            ) : (
+              <EmptyState
+                title="Featured 학술대회가 없습니다"
+                description="현재 Featured로 선정된 학술대회가 없습니다."
+                action={
+                  <Link href="/conferences">
+                    <Button variant="outline" size="sm">전체 보기</Button>
+                  </Link>
+                }
+              />
+            )}
+            {totalPages > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 40 }}>
+                <PaginationClient current={page} total={totalPages} />
+              </div>
+            )}
+          </div>
         ) : (
+          /* 일반 뷰 — sidebar + content */
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: sideBanner ? "1fr 280px" : "1fr",
+              display: "flex",
               gap: 24,
-              alignItems: "start",
+              alignItems: "flex-start",
             }}
           >
-            <div>
+            {/* 사이드바 필터 (데스크톱) */}
+            <div className="hidden md:block">
+              <ListSidebar
+                categories={categories}
+                cities={cities}
+                currentCategory={category}
+                currentCity={city}
+                currentDate={date}
+              />
+            </div>
+
+            {/* 콘텐츠 */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* 모바일용 축약 필터 (md 미만에서만 보임) */}
+              <div
+                className="md:hidden"
+                style={{
+                  background: "var(--bm-surface)",
+                  border: "1px solid var(--bm-border)",
+                  borderRadius: 8,
+                  padding: "12px 16px",
+                  marginBottom: 16,
+                }}
+              >
+                <FilterPanel
+                  categories={categories}
+                  cities={cities}
+                  currentCategory={category}
+                  currentCity={city}
+                  currentDate={date}
+                />
+              </div>
+
               {rows.length > 0 ? (
-                <ConferenceGrid conferences={rows} bookmarkedIds={bookmarkedIds} />
+                <>
+                  <ConferenceGrid conferences={rows} bookmarkedIds={bookmarkedIds} />
+                  {totalPages > 1 && (
+                    <div
+                      style={{ display: "flex", justifyContent: "center", marginTop: 40 }}
+                    >
+                      <PaginationClient current={page} total={totalPages} />
+                    </div>
+                  )}
+                </>
               ) : (
                 <EmptyState
                   title="조건에 맞는 학술대회가 없습니다"
@@ -217,22 +268,11 @@ export default async function ConferencesListPage({
                   }
                 />
               )}
-
-              {totalPages > 1 && (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: 40,
-                  }}
-                >
-                  <PaginationClient current={page} total={totalPages} />
-                </div>
-              )}
             </div>
 
+            {/* 배너 광고 (사이드바 오른쪽) */}
             {sideBanner && (
-              <aside style={{ position: "sticky", top: 88 }}>
+              <aside style={{ position: "sticky", top: 88, flexShrink: 0 }}>
                 <AdBanner
                   size="square"
                   sponsor={sideBanner.advertiser_name ?? undefined}
