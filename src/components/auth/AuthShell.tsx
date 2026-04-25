@@ -25,7 +25,7 @@ export function AuthShell({ children, width = 480 }: { children: ReactNode; widt
       >
         <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="바이오마이스 BioMICE" height={30} style={{ display: "block" }} />
+          <img src="/logo.png" alt="바이오마이스 BioMICE" style={{ display: "block", height: 30, width: "auto" }} />
         </Link>
       </header>
 
