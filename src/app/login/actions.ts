@@ -92,6 +92,14 @@ export async function logoutAction() {
   redirect("/");
 }
 
+export async function resetPasswordAction(email: string): Promise<void> {
+  const sb = await createClient();
+  const redirectTo =
+    (process.env.NEXT_PUBLIC_APP_URL ?? "https://biomice.xyz") +
+    "/auth/reset-password";
+  await sb.auth.resetPasswordForEmail(email, { redirectTo });
+}
+
 function translateAuthError(raw: string): string {
   if (/invalid login credentials/i.test(raw)) return "이메일 또는 비밀번호가 올바르지 않습니다.";
   if (/user already registered/i.test(raw)) return "이미 가입된 이메일입니다.";

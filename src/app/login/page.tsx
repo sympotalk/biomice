@@ -1,5 +1,4 @@
-import { HeaderServer as Header } from "@/components/layout/HeaderServer";
-import { Footer } from "@/components/layout/Footer";
+import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "./LoginForm";
 
 type SearchParams = Promise<{ "check-email"?: string; next?: string }>;
@@ -11,23 +10,11 @@ export default async function LoginPage({
 }) {
   const sp = await searchParams;
   return (
-    <>
-      <Header />
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "48px 20px",
-        }}
-      >
-        <LoginForm
-          checkEmail={sp["check-email"] === "1"}
-          next={sp.next}
-        />
-      </main>
-      <Footer />
-    </>
+    <AuthShell width={440}>
+      <LoginForm
+        checkEmail={sp["check-email"] === "1"}
+        next={sp.next}
+      />
+    </AuthShell>
   );
 }
