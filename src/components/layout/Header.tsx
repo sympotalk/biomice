@@ -59,7 +59,7 @@ export function Header({ userEmail }: Props) {
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="바이오마이스 BioMICE" height={36} style={{ display: "block" }} />
+          <img src="/logo.png" alt="바이오마이스 BioMICE" height={28} style={{ display: "block" }} />
         </Link>
 
         <nav

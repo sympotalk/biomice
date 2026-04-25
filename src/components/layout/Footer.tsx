@@ -21,7 +21,7 @@ export function Footer() {
       >
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="바이오마이스 BioMICE" height={32} style={{ display: "block", marginBottom: 8 }} />
+          <img src="/logo.png" alt="바이오마이스 BioMICE" height={24} style={{ display: "block", marginBottom: 8 }} />
           <p
             style={{
               fontSize: 12,
