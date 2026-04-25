@@ -35,7 +35,7 @@ export default async function HomePage() {
       <Header />
       <Hero totalUpcoming={upcoming.length} topSpecialties={topSpecialties} />
 
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
+      <main className="bm-main">
         {/* Main top banner */}
         {banner && (
           <div style={{ padding: "24px 0" }}>
@@ -51,7 +51,7 @@ export default async function HomePage() {
 
         {/* Featured */}
         {featured.length > 0 && (
-          <section style={{ padding: "32px 0" }}>
+          <section className="bm-section">
             <SectionHeader
               title="Featured 학술대회"
               caption="주목할 만한 학술대회"
@@ -62,7 +62,7 @@ export default async function HomePage() {
         )}
 
         {/* This week */}
-        <section style={{ padding: "32px 0" }}>
+        <section className="bm-section">
           <SectionHeader
             title="이번 주 열리는 학술대회"
             caption={`앞으로 7일 이내 · ${thisWeek.length}건`}
@@ -79,7 +79,7 @@ export default async function HomePage() {
         </section>
 
         {/* Upcoming */}
-        <section style={{ padding: "32px 0 64px" }}>
+        <section className="bm-section-last">
           <SectionHeader
             title="다가오는 학술대회"
             caption="가까운 일정순"

@@ -125,13 +125,7 @@ export default async function ConferencesListPage({
       <Header />
 
       {/* ── Hero bar ─────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          borderBottom: "1px solid var(--bm-border)",
-          background: "var(--bm-bg)",
-          padding: "20px 24px",
-        }}
-      >
+      <div className="bm-list-hero">
         <div
           style={{
             maxWidth: 1280,
@@ -166,10 +160,10 @@ export default async function ConferencesListPage({
       </div>
 
       <main
+        className="bm-main"
         style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "24px 20px 64px",
+          paddingTop: 24,
+          paddingBottom: 64,
         }}
       >
         {/* 캘린더 뷰 */}

@@ -11,17 +11,9 @@ type Props = {
 export function ConferenceGrid({ conferences, scroll, bookmarkedIds }: Props) {
   if (scroll) {
     return (
-      <div
-        style={{
-          display: "flex",
-          gap: 16,
-          overflowX: "auto",
-          paddingBottom: 12,
-          scrollbarWidth: "none",
-        }}
-      >
+      <div className="bm-scroll-row">
         {conferences.map((c) => (
-          <div key={c.id} style={{ flexShrink: 0, width: 280 }}>
+          <div key={c.id} className="bm-scroll-card">
             <CardFromRow
               conference={c}
               bookmarked={bookmarkedIds?.has(c.id) ?? false}
@@ -33,13 +25,7 @@ export function ConferenceGrid({ conferences, scroll, bookmarkedIds }: Props) {
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gap: 16,
-        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-      }}
-    >
+    <div className="bm-card-grid">
       {conferences.map((c) => (
         <CardFromRow
           key={c.id}

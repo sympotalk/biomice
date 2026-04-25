@@ -177,6 +177,10 @@ body {
 
 /* ── 모바일 (≤768px) ─────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  .bm-list-hero {
+    padding: 14px 16px;
+  }
+
   /* 학회 그리드: 2열 */
   .bm-society-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -228,6 +232,84 @@ body {
 @media (max-width: 480px) {
   .bm-society-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ── Hero section ────────────────────────────────────────────────────────── */
+.bm-hero {
+  padding: 72px 20px 56px;
+}
+
+/* ── Main content wrapper ────────────────────────────────────────────────── */
+.bm-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ── Home page sections ───────────────────────────────────────────────────── */
+.bm-section {
+  padding: 32px 0;
+}
+.bm-section-last {
+  padding: 32px 0 64px;
+}
+
+/* ── Conference card grid ─────────────────────────────────────────────────── */
+.bm-card-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* ── Horizontal scroll strip ─────────────────────────────────────────────── */
+.bm-scroll-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.bm-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+.bm-scroll-card {
+  flex-shrink: 0;
+  width: 280px;
+}
+
+/* ── 모바일 (≤768px) — layout classes ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .bm-hero {
+    padding: 40px 16px 32px;
+  }
+  .bm-main {
+    padding: 0 12px;
+  }
+  .bm-section {
+    padding: 20px 0;
+  }
+  .bm-section-last {
+    padding: 20px 0 48px;
+  }
+  .bm-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .bm-scroll-card {
+    width: 248px;
+  }
+}
+
+/* ── 소형 모바일 (≤400px) ────────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .bm-card-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .bm-scroll-card {
+    width: 220px;
   }
 }
 

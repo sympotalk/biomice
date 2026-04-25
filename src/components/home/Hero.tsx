@@ -24,11 +24,11 @@ export function Hero({ totalUpcoming = 0, topSpecialties = [] }: Props) {
 
   return (
     <section
+      className="bm-hero"
       style={{
         position: "relative",
         background: "linear-gradient(180deg, #F5F9FC 0%, var(--bm-bg) 100%)",
         borderBottom: "1px solid var(--bm-border)",
-        padding: "72px 20px 56px",
         overflow: "hidden",
       }}
     >
