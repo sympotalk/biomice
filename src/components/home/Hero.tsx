@@ -79,10 +79,10 @@ export function Hero({ totalUpcoming = 0, topSpecialties = [] }: Props) {
         <h1
           style={{
             margin: 0,
-            fontSize: "clamp(26px, 5vw, 44px)",
+            fontSize: "clamp(22px, 5vw, 44px)",
             fontWeight: 800,
             letterSpacing: -0.8,
-            lineHeight: 1.2,
+            lineHeight: 1.25,
             color: "var(--bm-text-primary)",
           }}
         >
@@ -91,8 +91,8 @@ export function Hero({ totalUpcoming = 0, topSpecialties = [] }: Props) {
         </h1>
         <p
           style={{
-            margin: "16px 0 36px",
-            fontSize: "clamp(14px, 2vw, 17px)",
+            margin: "12px 0 24px",
+            fontSize: "clamp(13px, 2vw, 17px)",
             color: "var(--bm-text-secondary)",
             lineHeight: 1.5,
           }}
@@ -109,12 +109,12 @@ export function Hero({ totalUpcoming = 0, topSpecialties = [] }: Props) {
 
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <div
+            className="bm-hero-search"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              height: 60,
-              padding: "0 8px 0 20px",
+              gap: 6,
+              padding: "0 6px 0 14px",
               background: "var(--bm-bg)",
               borderRadius: 12,
               border: "1.5px solid var(--bm-border)",

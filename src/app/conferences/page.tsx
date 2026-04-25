@@ -200,7 +200,7 @@ export default async function ConferencesListPage({
           /* 일반 뷰 — sidebar + content */
           <div className="bm-list-layout">
             {/* 사이드바 필터 (데스크톱) */}
-            <div className="hidden md:block">
+            <div className="bm-show-desktop">
               <ListSidebar
                 categories={categories}
                 cities={cities}
@@ -214,13 +214,13 @@ export default async function ConferencesListPage({
             <div style={{ flex: 1, minWidth: 0 }}>
               {/* 모바일용 축약 필터 (md 미만에서만 보임) */}
               <div
-                className="md:hidden"
+                className="bm-show-mobile"
                 style={{
                   background: "var(--bm-surface)",
                   border: "1px solid var(--bm-border)",
                   borderRadius: 8,
-                  padding: "12px 16px",
-                  marginBottom: 16,
+                  padding: "12px 14px",
+                  marginBottom: 14,
                 }}
               >
                 <FilterPanel
