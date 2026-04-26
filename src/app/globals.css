@@ -5,6 +5,15 @@
    their utility classes (hidden, md:flex, etc.) generated in production. */
 @source "../**/*.{ts,tsx,js,jsx,html}";
 
+/* ─── 전역 box-sizing border-box ──────────────────────────────────────────
+   Tailwind v4 Preflight가 자동 적용한다고는 하지만, 운영 빌드에서 이 규칙이
+   누락되어 padding이 width에 추가됨 → 카드/배너 우측이 viewport 밖으로 잘리는
+   증상의 근본 원인. 명시적으로 다시 적용한다.
+   ──────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* ────────────────────────────────────────────────────────────
    biomice — design tokens (CSS variables)
    ──────────────────────────────────────────────────────────── */
@@ -316,6 +325,62 @@ html, body {
   margin-top: 4px;
   font-size: 12px;
   color: var(--bm-text-tertiary);
+}
+
+/* ════════════════════════════════════════════════════════════
+   AD BANNER (반응형 padding/logo/title)
+   ════════════════════════════════════════════════════════════ */
+
+.bm-ad {
+  /* 공통 — 인라인 style이 대부분의 속성 지정 */
+}
+.bm-ad-wide,
+.bm-ad-square {
+  padding: 0 24px;
+}
+.bm-ad-compact,
+.bm-ad-mini {
+  padding: 0 14px;
+}
+.bm-ad-logo {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+}
+.bm-ad-compact .bm-ad-logo,
+.bm-ad-mini .bm-ad-logo {
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
+}
+.bm-ad-title {
+  font-size: 15px;
+}
+.bm-ad-compact .bm-ad-title,
+.bm-ad-mini .bm-ad-title {
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  /* 모바일: wide 배너 padding 축소, 로고 작게, CTA 숨김 */
+  .bm-ad-wide,
+  .bm-ad-square {
+    padding: 0 14px;
+  }
+  .bm-ad-wide .bm-ad-logo,
+  .bm-ad-square .bm-ad-logo {
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
+  }
+  .bm-ad-wide .bm-ad-title,
+  .bm-ad-square .bm-ad-title {
+    font-size: 13px;
+  }
+  /* 모바일에서 CTA 버튼 숨김 — 어차피 카드 전체가 클릭 가능 */
+  .bm-ad-cta {
+    display: none;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════

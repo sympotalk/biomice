@@ -60,7 +60,13 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
   return (
     <Link
       href={`/societies/${s.slug}`}
-      style={{ textDecoration: "none", display: "flex", minWidth: 0 }}
+      style={{
+        textDecoration: "none",
+        display: "flex",
+        width: "100%",
+        minWidth: 0,
+        boxSizing: "border-box",
+      }}
     >
       <div
         className="bm-society-card"

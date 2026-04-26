@@ -33,6 +33,7 @@ export function AdBanner({
 
   const inner = (
     <div
+      className={`bm-ad bm-ad-${size}`}
       style={{
         position: "relative",
         height: d.h,
@@ -49,7 +50,6 @@ export function AdBanner({
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
-        padding: isCompact ? "0 14px" : "0 24px",
         gap: 12,
       }}
     >
@@ -67,9 +67,8 @@ export function AdBanner({
         {label}
       </span>
       <div
+        className="bm-ad-logo"
         style={{
-          width: isCompact ? 44 : 56,
-          height: isCompact ? 44 : 56,
           flexShrink: 0,
           background:
             size === "compact"
@@ -80,7 +79,6 @@ export function AdBanner({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: isCompact ? 16 : 18,
           fontWeight: 700,
           fontFamily: "var(--font-mono)",
         }}
@@ -103,8 +101,8 @@ export function AdBanner({
           </div>
         )}
         <div
+          className="bm-ad-title"
           style={{
-            fontSize: isCompact ? 13 : 15,
             fontWeight: 600,
             color: "var(--bm-text-primary)",
             overflow: "hidden",
@@ -127,9 +125,11 @@ export function AdBanner({
         </div>
       </div>
       {!isCompact && cta && (
-        <Button variant="outline" size="sm" iconRight={<ExternalIcon />}>
-          {cta}
-        </Button>
+        <div className="bm-ad-cta">
+          <Button variant="outline" size="sm" iconRight={<ExternalIcon />}>
+            {cta}
+          </Button>
+        </div>
       )}
     </div>
   );

@@ -93,6 +93,9 @@ export function ConferenceCardRow({
       style={{
         position: "relative",
         display: "flex",
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: 0,
         gap: 12,
         padding: 12,
         background: featured ? "var(--bm-accent-subtle)" : "var(--bm-surface)",
@@ -104,6 +107,7 @@ export function ConferenceCardRow({
         filter: isPast ? "grayscale(0.6)" : "none",
         opacity: isPast ? 0.7 : 1,
         transition: "border-color .12s, box-shadow .12s",
+        boxSizing: "border-box",
       }}
     >
       {featured && (
