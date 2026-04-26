@@ -98,6 +98,7 @@ export function MobileFilterToolbar({
         <div
           style={{
             flex: 1,
+            minWidth: 0,
             height: 38,
             padding: "0 12px",
             display: "flex",
@@ -116,6 +117,7 @@ export function MobileFilterToolbar({
           <input
             ref={inputRef}
             type="text"
+            size={1}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {

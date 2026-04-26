@@ -14,6 +14,23 @@
   box-sizing: border-box;
 }
 
+/* ─── 모바일 viewport overflow 방어선 ──────────────────────────────────────
+   <html>이 viewport보다 절대 커지지 않도록 강제. 한국어 placeholder/제목 등이
+   nowrap으로 자식 width를 키우는 경우를 막는다. */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* 폼 요소가 user agent의 default size attribute (input의 size=20)로
+   intrinsic min-width를 만들어서 부모 flex 컨테이너를 viewport 밖으로
+   밀어내는 것을 막는다. */
+input, button, select, textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
 /* ────────────────────────────────────────────────────────────
    biomice — design tokens (CSS variables)
    ──────────────────────────────────────────────────────────── */
@@ -123,11 +140,6 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Prevent horizontal scroll on mobile from any rogue overflow */
-html, body {
-  overflow-x: hidden;
 }
 
 .mono-num {

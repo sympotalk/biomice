@@ -137,6 +137,7 @@ export function Hero({ totalUpcoming = 0, topSpecialties = [] }: Props) {
                 style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }}
               />
               <input
+                size={1}
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 onKeyDown={(e) => {

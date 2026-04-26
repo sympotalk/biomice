@@ -41,10 +41,13 @@ export function SearchBar({
         borderRadius: radius.input,
         transition: "border-color .14s",
         boxShadow: focused ? "0 0 0 3px rgba(26,111,170,0.12)" : "none",
+        minWidth: 0,
+        width: "100%",
       }}
     >
-      <SearchIcon style={{ color: "var(--bm-text-tertiary)" }} />
+      <SearchIcon style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }} />
       <input
+        size={1}
         value={current}
         onChange={(e) => (onChange ? onChange(e.target.value) : setInternal(e.target.value))}
         onFocus={() => setFocused(true)}
@@ -53,6 +56,8 @@ export function SearchBar({
         placeholder={placeholder}
         style={{
           flex: 1,
+          minWidth: 0,
+          width: "100%",
           border: "none",
           outline: "none",
           background: "transparent",
