@@ -159,9 +159,26 @@ export function ConferenceCardRow({
       </div>
 
       {/* 우측 정보 */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          maxWidth: "100%",
+          overflow: "hidden",
+        }}
+      >
         {/* 1줄: 배지 + 즐겨찾기 */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginBottom: 4,
+            minWidth: 0,
+            maxWidth: "100%",
+            overflow: "hidden",
+          }}
+        >
           {specialty && (
             <span
               style={{
@@ -229,6 +246,9 @@ export function ConferenceCardRow({
         {/* 2줄: 제목 (1줄 ellipsis) */}
         <div
           style={{
+            display: "block",
+            width: "100%",
+            maxWidth: "100%",
             fontSize: 14,
             fontWeight: 600,
             color: "var(--bm-text-primary)",

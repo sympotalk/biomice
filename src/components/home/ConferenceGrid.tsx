@@ -49,8 +49,17 @@ export function ConferenceGrid({ conferences, scroll, bookmarkedIds }: Props) {
       </div>
 
       {/* ── 모바일 ─────────────────────────────────────────────────────── */}
-      <div className="bm-show-mobile">
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div className="bm-show-mobile" style={{ width: "100%", minWidth: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            width: "100%",
+            minWidth: 0,
+            maxWidth: "100%",
+          }}
+        >
           {conferences.map((c) => (
             <RowFromConf
               key={c.id}

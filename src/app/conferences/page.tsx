@@ -223,7 +223,14 @@ export default async function ConferencesListPage({
             </div>
 
             {/* 콘텐츠 */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+                maxWidth: "100%",
+                width: "100%",
+              }}
+            >
               {/* 모바일용 sticky 검색·필터 toolbar + 바텀시트 */}
               <MobileFilterToolbar
                 categories={categories}
