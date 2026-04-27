@@ -249,10 +249,26 @@ body {
    GRIDS
    ════════════════════════════════════════════════════════════ */
 
-/* 학회 목록.
-   minmax(0, 1fr) 트릭: grid item의 default min-width: auto는 자식 콘텐츠
-   기준이라 한국어 nowrap/keep-all 텍스트가 1fr 약속을 깰 수 있다.
-   minmax(0, 1fr)로 명시하면 column이 콘텐츠 무관하게 정확히 1fr만 차지. */
+/* 학회 목록 v3 — 모바일 2열 강제, 데스크톱 3-4열로 grow.
+   인라인 grid로 시작하지만 데스크톱 브레이크포인트는 CSS로. */
+.bm-society-grid-v3 {
+  width: 100%;
+  max-width: 100%;
+}
+@media (min-width: 768px) {
+  .bm-society-grid-v3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+}
+@media (min-width: 1024px) {
+  .bm-society-grid-v3 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+}
+
+/* 기존 bm-society-grid (admin 등 다른 곳에서 사용) */
 .bm-society-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

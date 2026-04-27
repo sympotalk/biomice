@@ -13,6 +13,7 @@ import {
   getMyBookmarkIds,
 } from "@/lib/queries";
 import { computeDDay } from "@/lib/dates";
+import { societyAbbr, specialtyColor } from "@/lib/society";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -84,23 +85,25 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
             flexWrap: "wrap",
           }}
         >
-          {/* 아바타 */}
+          {/* 아바타 (영문 약자 박스) */}
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 12,
-              background: "var(--bm-primary-subtle)",
-              color: "var(--bm-primary)",
+              width: 72,
+              height: 72,
+              borderRadius: 14,
+              background: specialtyColor(society.specialty),
+              color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 20,
+              fontSize: societyAbbr(society.name).length > 4 ? 14 : 16,
+              fontFamily: "var(--font-mono)",
               fontWeight: 800,
+              letterSpacing: 0.5,
               flexShrink: 0,
             }}
           >
-            {society.name.slice(2, 4)}
+            {societyAbbr(society.name)}
           </div>
 
           <div style={{ flex: 1, minWidth: 240 }}>
