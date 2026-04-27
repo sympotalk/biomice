@@ -117,6 +117,25 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 {conf.is_featured && <FeaturedBadge variant="featured" />}
                 {regOpen && <RegistrationOpenBadge />}
                 <DDayBadge days={dd} />
+                {conf.is_kams_certified && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      height: 24,
+                      padding: "0 10px",
+                      background: "var(--bm-primary)",
+                      color: "#fff",
+                      borderRadius: 4,
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}
+                    title="대한의학회 국내개최 국제학술대회 인정"
+                  >
+                    ✓ KAMS 인정
+                  </span>
+                )}
                 {conf.category && (
                   <span
                     style={{

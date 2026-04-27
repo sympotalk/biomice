@@ -129,6 +129,7 @@ export type Database = {
           category: string | null
           city: string | null
           cme_credits: number | null
+          cme_credits_kr: number | null
           conference_type: string
           country_code: string
           country_name: string | null
@@ -142,12 +143,16 @@ export type Database = {
           id: number
           is_deleted: boolean
           is_featured: boolean
+          is_kams_certified: boolean
           kams_id: string | null
+          kams_notice_no: string | null
+          kams_notice_url: string | null
           lat: number | null
           lng: number | null
           mode: string
           registration_deadline: string | null
           registration_url: string | null
+          related_korean_society: string | null
           related_kr_societies: number[] | null
           series_id: number | null
           society_id: number | null
@@ -167,6 +172,7 @@ export type Database = {
           category?: string | null
           city?: string | null
           cme_credits?: number | null
+          cme_credits_kr?: number | null
           conference_type?: string
           country_code?: string
           country_name?: string | null
@@ -180,12 +186,16 @@ export type Database = {
           id?: number
           is_deleted?: boolean
           is_featured?: boolean
+          is_kams_certified?: boolean
           kams_id?: string | null
+          kams_notice_no?: string | null
+          kams_notice_url?: string | null
           lat?: number | null
           lng?: number | null
           mode?: string
           registration_deadline?: string | null
           registration_url?: string | null
+          related_korean_society?: string | null
           related_kr_societies?: number[] | null
           series_id?: number | null
           society_id?: number | null
@@ -205,6 +215,7 @@ export type Database = {
           category?: string | null
           city?: string | null
           cme_credits?: number | null
+          cme_credits_kr?: number | null
           conference_type?: string
           country_code?: string
           country_name?: string | null
@@ -218,12 +229,16 @@ export type Database = {
           id?: number
           is_deleted?: boolean
           is_featured?: boolean
+          is_kams_certified?: boolean
           kams_id?: string | null
+          kams_notice_no?: string | null
+          kams_notice_url?: string | null
           lat?: number | null
           lng?: number | null
           mode?: string
           registration_deadline?: string | null
           registration_url?: string | null
+          related_korean_society?: string | null
           related_kr_societies?: number[] | null
           series_id?: number | null
           society_id?: number | null

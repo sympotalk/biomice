@@ -58,6 +58,13 @@ export async function runIntlCrawler(
         .eq("source_id", ev.sourceId)
         .maybeSingle();
 
+      // 어댑터가 추가 메타데이터를 IntlEvent에 attach한 경우 추출 (KAMS 인정 등)
+      const meta = ev as IntlEvent & {
+        _isKamsCertified?: boolean;
+        _kamsNoticeUrl?: string;
+        _kamsNoticeNo?: string;
+      };
+
       const row = {
         event_name: ev.title,
         society_name: ev.societyName,
@@ -82,6 +89,12 @@ export async function runIntlCrawler(
         conference_type: "international",
         source_type: adapter.key,
         source_id: ev.sourceId,
+        // KAMS 인정 메타 (kams-certified 어댑터만 채움)
+        is_kams_certified: meta._isKamsCertified ?? false,
+        kams_notice_url: meta._kamsNoticeUrl ?? null,
+        kams_notice_no: meta._kamsNoticeNo ?? null,
+        // KAMS 인정의 경우 societyName이 한글 학회명 (예: "대한심장학회")
+        related_korean_society: meta._isKamsCertified ? ev.societyName : null,
       };
 
       if (existing) {

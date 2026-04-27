@@ -7,6 +7,11 @@ import { accAdapter } from "./sources/acc";
 import { adaAdapter } from "./sources/ada";
 import { rsnaAdapter } from "./sources/rsna";
 import { eularAdapter } from "./sources/eular";
+import { kamsCertifiedAdapter } from "./sources/kams-certified";
+import {
+  allConferenceAlertAdapter,
+  mConferencesAdapter,
+} from "./sources/generic-aggregator";
 
 /**
  * 등록된 국제 학술대회 어댑터 목록.
@@ -23,16 +28,21 @@ import { eularAdapter } from "./sources/eular";
  */
 export const ADAPTERS: IntlAdapter[] = [
   // P0 — 한국 의사 관심도 최상
-  escAdapter,    // 심장내과
-  ahaAdapter,    // 심장내과
-  ascoAdapter,   // 종양 (내과)
-  accAdapter,    // 심장내과
-  adaAdapter,    // 당뇨/내분비 (내과)
-  rsnaAdapter,   // 영상의학
-  esmoAdapter,   // 종양 (내과)
+  kamsCertifiedAdapter,  // 대한의학회 인정 학술대회 (한국 의사 핵심 데이터)
+  escAdapter,            // 심장내과
+  ahaAdapter,            // 심장내과
+  ascoAdapter,           // 종양 (내과)
+  accAdapter,            // 심장내과
+  adaAdapter,            // 당뇨/내분비 (내과)
+  rsnaAdapter,           // 영상의학
+  esmoAdapter,           // 종양 (내과)
 
   // P1 — 보조
-  eularAdapter,  // 류마티스 (내과)
+  eularAdapter,          // 류마티스 (내과)
+
+  // P2 — 범용 어그리게이터 (한국 키워드 필터링)
+  allConferenceAlertAdapter,
+  mConferencesAdapter,
 
   // TODO: P1+ 추가
   // - AACR (https://www.aacr.org/meeting/aacr-annual-meeting/)

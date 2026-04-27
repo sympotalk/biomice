@@ -126,6 +126,9 @@ function RowFromConf({
       conferenceType={c.conference_type}
       countryCode={c.country_code}
       cmeCredits={c.cme_credits}
+      cmeCreditsKr={c.cme_credits_kr}
+      kamsCertified={c.is_kams_certified}
+      relatedKoreanSociety={c.related_korean_society}
       favorite={bookmarked}
     />
   );

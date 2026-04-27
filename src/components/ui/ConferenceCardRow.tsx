@@ -25,6 +25,12 @@ export type ConferenceCardRowProps = {
   countryCode?: string | null;
   /** KMA 등 인정 평점 (예: 6.0) */
   cmeCredits?: number | null;
+  /** 국내 평점 (cme_credits_kr) */
+  cmeCreditsKr?: number | null;
+  /** 대한의학회(KAMS) 국내개최 국제학술대회 인정 여부 */
+  kamsCertified?: boolean;
+  /** 연관 국내 학회명 (KAMS 인정 또는 admin 매뉴얼 입력) */
+  relatedKoreanSociety?: string | null;
   /** Deprecated: 이미지 로고 사용 안 함 — 영문 약자 박스로 통일. */
   logoUrl?: string;
 };
@@ -69,10 +75,13 @@ export function ConferenceCardRow({
   conferenceType,
   countryCode,
   cmeCredits,
+  cmeCreditsKr,
+  kamsCertified,
 }: ConferenceCardRowProps) {
   const isPast = dDay != null && dDay < 0;
   const isIntl = conferenceType === "international";
   const flag = countryCode ? COUNTRY_FLAG[countryCode] : null;
+  const cmePoint = cmeCreditsKr ?? cmeCredits;
 
   // D-day 칩 스타일
   let dBg = "var(--bm-bg-muted)";
@@ -224,6 +233,26 @@ export function ConferenceCardRow({
               {flag ? flag : "🌐"} 국제
             </span>
           )}
+          {kamsCertified && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                height: 18,
+                padding: "0 6px",
+                background: "var(--bm-primary)",
+                color: "#fff",
+                borderRadius: 3,
+                fontSize: 10,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+              title="대한의학회 국내개최 국제학술대회 인정"
+            >
+              ✓ KAMS 인정
+            </span>
+          )}
           {specialty && (
             <span
               style={{
@@ -241,7 +270,7 @@ export function ConferenceCardRow({
               {specialty}
             </span>
           )}
-          {cmeCredits != null && cmeCredits > 0 && (
+          {cmePoint != null && cmePoint > 0 && (
             <span
               className="mono-num"
               style={{
@@ -257,9 +286,9 @@ export function ConferenceCardRow({
                 fontWeight: 700,
                 flexShrink: 0,
               }}
-              aria-label="KMA 평점"
+              aria-label="국내 평점"
             >
-              평점 {cmeCredits}
+              평점 {cmePoint}
             </span>
           )}
           {dDay != null && (
