@@ -5,76 +5,81 @@ import Link from "next/link";
 import type { SocietyWithCount } from "@/lib/queries";
 import { societyAbbr, specialtyColor } from "@/lib/society";
 
-// ─── Society Card ─────────────────────────────────────────────────────────────
+// ─── Society Card (가로형 row — 항상 1열 stack) ─────────────────────────────
 
 function SocietyCard({ s }: { s: SocietyWithCount }) {
   const abbr = societyAbbr(s.name);
   const color = specialtyColor(s.specialty);
+  const isLong = abbr.length > 4;
 
   return (
     <Link
       href={`/societies/${s.slug}`}
       style={{
-        textDecoration: "none",
-        display: "flex",
+        display: "block",
         width: "100%",
+        maxWidth: "100%",
         minWidth: 0,
+        textDecoration: "none",
+        color: "inherit",
         boxSizing: "border-box",
       }}
     >
       <div
         style={{
-          flex: 1,
-          minWidth: 0,
+          width: "100%",
           maxWidth: "100%",
+          minWidth: 0,
+          boxSizing: "border-box",
           background: "var(--bm-surface)",
           border: "1px solid var(--bm-border)",
           borderRadius: 12,
           padding: 12,
           display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+          alignItems: "center",
+          gap: 12,
           overflow: "hidden",
-          color: "inherit",
-          minHeight: 142,
         }}
       >
-        {/* Header: 영어 이니셜 박스 + 진료과 칩 */}
+        {/* 영문 약자 박스 */}
         <div
           style={{
+            width: 48,
+            height: 48,
+            flexShrink: 0,
+            borderRadius: 8,
+            background: color,
+            color: "#fff",
             display: "flex",
             alignItems: "center",
-            gap: 6,
+            justifyContent: "center",
+            fontFamily: "var(--font-mono)",
+            fontWeight: 800,
+            fontSize: isLong ? 10 : 12,
+            letterSpacing: 0.3,
+          }}
+        >
+          {abbr}
+        </div>
+
+        {/* 가운데: 진료과 칩 + 학회명 */}
+        <div
+          style={{
+            flex: 1,
             minWidth: 0,
             maxWidth: "100%",
             overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
           }}
         >
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 8,
-              background: color,
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-mono)",
-              fontWeight: 800,
-              fontSize: abbr.length > 4 ? 9 : abbr.length > 3 ? 10 : 11,
-              letterSpacing: 0.3,
-              flexShrink: 0,
-            }}
-          >
-            {abbr}
-          </div>
           {s.specialty && (
             <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
+                alignSelf: "flex-start",
                 height: 18,
                 padding: "0 6px",
                 background: "var(--bm-primary-subtle)",
@@ -82,8 +87,7 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
                 borderRadius: 3,
                 fontSize: 10,
                 fontWeight: 600,
-                flexShrink: 1,
-                minWidth: 0,
+                maxWidth: "100%",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -92,65 +96,57 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
               {s.specialty}
             </span>
           )}
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 700,
+              color: "var(--bm-text-primary)",
+              lineHeight: 1.35,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
+            }}
+          >
+            {s.name}
+          </div>
         </div>
 
-        {/* 학회명 */}
+        {/* 우측: 카운트 + chevron */}
         <div
           style={{
-            fontSize: 13,
-            fontWeight: 700,
-            color: "var(--bm-text-primary)",
-            lineHeight: 1.4,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            wordBreak: "break-word",
-            overflowWrap: "anywhere",
-            flex: 1,
-          }}
-        >
-          {s.name}
-        </div>
-
-        {/* 하단 row */}
-        <div
-          style={{
-            paddingTop: 10,
-            borderTop: "1px solid var(--bm-border)",
+            flexShrink: 0,
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
+            gap: 6,
           }}
         >
-          <div style={{ minWidth: 0, overflow: "hidden" }}>
-            <div
+          {s.conference_count > 0 ? (
+            <span
+              className="mono-num"
               style={{
-                fontSize: 10,
-                color: "var(--bm-text-tertiary)",
-                marginBottom: 2,
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#fff",
+                background: "var(--bm-primary)",
+                padding: "3px 8px",
+                borderRadius: 999,
+                whiteSpace: "nowrap",
               }}
             >
-              예정 학술대회
-            </div>
-            {s.conference_count > 0 ? (
-              <span
-                className="mono-num"
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "var(--bm-primary)",
-                }}
-              >
-                예정 {s.conference_count}건
-              </span>
-            ) : (
-              <span style={{ fontSize: 11, color: "var(--bm-text-tertiary)" }}>
-                없음
-              </span>
-            )}
-          </div>
+              {s.conference_count}건
+            </span>
+          ) : (
+            <span
+              style={{
+                fontSize: 11,
+                color: "var(--bm-text-tertiary)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              없음
+            </span>
+          )}
           <svg
             width="14"
             height="14"
@@ -159,7 +155,7 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
             stroke="currentColor"
             strokeWidth="1.6"
             strokeLinecap="round"
-            style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }}
+            style={{ color: "var(--bm-text-tertiary)" }}
           >
             <path d="M5 2l4 5-4 5" />
           </svg>
@@ -199,19 +195,20 @@ export function SocietyList({ societies }: { societies: SocietyWithCount[] }) {
   const withoutConf = filtered.filter((s) => s.conference_count === 0);
 
   return (
-    <div>
+    <div style={{ width: "100%", maxWidth: "100%", minWidth: 0 }}>
       {/* ── 컨트롤 바 ──────────────────────────────────────────────────────── */}
       <div
         style={{
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
-          gap: 16,
-          marginBottom: 18,
+          gap: 12,
+          marginBottom: 16,
           flexWrap: "wrap",
+          maxWidth: "100%",
+          minWidth: 0,
         }}
       >
-        {/* 진료과 탭 (가로 스크롤) */}
         <div
           style={{
             display: "flex",
@@ -246,7 +243,6 @@ export function SocietyList({ societies }: { societies: SocietyWithCount[] }) {
           })}
         </div>
 
-        {/* 정렬 */}
         <div
           style={{
             display: "flex",
@@ -285,18 +281,18 @@ export function SocietyList({ societies }: { societies: SocietyWithCount[] }) {
         </div>
       </div>
 
-      {/* ── 카드 그리드 — v3: minmax(0,1fr) + 인라인 grid (캐시 회피) ── */}
+      {/* ── 카드 stack — 1열 강제 (모바일 안정성 우선) ────────────────────── */}
       {withConf.length > 0 && (
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+            display: "flex",
+            flexDirection: "column",
             gap: 8,
             width: "100%",
             maxWidth: "100%",
+            minWidth: 0,
             marginBottom: withoutConf.length > 0 ? 24 : 0,
           }}
-          className="bm-society-grid-v3"
         >
           {withConf.map((s) => (
             <SocietyCard key={s.id} s={s} />
@@ -337,14 +333,14 @@ export function SocietyList({ societies }: { societies: SocietyWithCount[] }) {
           )}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+              display: "flex",
+              flexDirection: "column",
               gap: 8,
               width: "100%",
               maxWidth: "100%",
+              minWidth: 0,
               opacity: 0.65,
             }}
-            className="bm-society-grid-v3"
           >
             {withoutConf.map((s) => (
               <SocietyCard key={s.id} s={s} />

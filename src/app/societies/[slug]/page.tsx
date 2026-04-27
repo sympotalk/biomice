@@ -53,7 +53,10 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
   return (
     <>
       <Header />
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 20px 64px" }}>
+      <main
+        className="bm-main"
+        style={{ paddingTop: 24, paddingBottom: 64 }}
+      >
         {/* Breadcrumb */}
         <nav
           style={{
@@ -77,12 +80,17 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
             background: "var(--bm-surface)",
             border: "1px solid var(--bm-border)",
             borderRadius: 12,
-            padding: "28px 32px",
-            marginBottom: 32,
+            padding: "20px",
+            marginBottom: 24,
             display: "flex",
-            gap: 24,
+            gap: 16,
             alignItems: "flex-start",
             flexWrap: "wrap",
+            width: "100%",
+            maxWidth: "100%",
+            minWidth: 0,
+            overflow: "hidden",
+            boxSizing: "border-box",
           }}
         >
           {/* 아바타 (영문 약자 박스) */}
@@ -106,7 +114,7 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
             {societyAbbr(society.name)}
           </div>
 
-          <div style={{ flex: 1, minWidth: 240 }}>
+          <div style={{ flex: 1, minWidth: 0, maxWidth: "100%", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
               <h1
                 style={{
