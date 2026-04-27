@@ -4,31 +4,16 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { SocietyWithCount } from "@/lib/queries";
 
-// ─── Logo ─────────────────────────────────────────────────────────────────────
+// ─── Logo (이미지 사용 안 함 — 학회명에서 추출한 한글 이니셜만) ──────────────
 
-function SocietyLogo({ name, logoUrl }: { name: string; logoUrl?: string | null }) {
-  const [err, setErr] = useState(false);
-  const initials = name.replace(/^대한/, "").replace(/학회$/, "").slice(0, 2);
-
-  if (logoUrl && !err) {
-    return (
-      <img
-        src={logoUrl}
-        alt=""
-        onError={() => setErr(true)}
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: 8,
-          objectFit: "contain",
-          background: "#fff",
-          padding: 4,
-          border: "1px solid var(--bm-border)",
-          flexShrink: 0,
-        }}
-      />
-    );
-  }
+function SocietyLogo({ name }: { name: string }) {
+  // "대한XX학회" → "XX", "한국XX협회" → "XX" 등
+  const initials = name
+    .replace(/^대한/, "")
+    .replace(/^한국/, "")
+    .replace(/학회$/, "")
+    .replace(/협회$/, "")
+    .slice(0, 2);
 
   return (
     <div
@@ -47,7 +32,7 @@ function SocietyLogo({ name, logoUrl }: { name: string; logoUrl?: string | null 
         letterSpacing: -0.3,
       }}
     >
-      {initials}
+      {initials || name.slice(0, 2)}
     </div>
   );
 }
@@ -99,7 +84,7 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
             minWidth: 0,
           }}
         >
-          <SocietyLogo name={s.name} logoUrl={s.logo_url} />
+          <SocietyLogo name={s.name} />
           <div
             style={{
               flex: 1,

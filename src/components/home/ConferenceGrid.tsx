@@ -94,7 +94,6 @@ function CardFromRow({
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
       logoText={societyShort(c.society_name)}
-      logoUrl={faviconUrl(c.society_url)}
       favorite={bookmarked}
     />
   );
@@ -121,23 +120,17 @@ function RowFromConf({
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
       logoText={societyShort(c.society_name)}
-      logoUrl={faviconUrl(c.society_url)}
       favorite={bookmarked}
     />
   );
 }
 
 function societyShort(society: string): string {
-  const cleaned = society.replace(/대한|학회|협회/g, "");
-  return cleaned.slice(0, 2).toUpperCase();
-}
-
-function faviconUrl(societyUrl: string | null | undefined): string | undefined {
-  if (!societyUrl) return undefined;
-  try {
-    const { hostname } = new URL(societyUrl);
-    return `https://icons.duckduckgo.com/ip3/${hostname}.ico`;
-  } catch {
-    return undefined;
-  }
+  // "대한XX학회" → "XX", "한국XX협회" → "XX" 등
+  const cleaned = society
+    .replace(/^대한/, "")
+    .replace(/^한국/, "")
+    .replace(/학회$/, "")
+    .replace(/협회$/, "");
+  return (cleaned || society).slice(0, 2);
 }

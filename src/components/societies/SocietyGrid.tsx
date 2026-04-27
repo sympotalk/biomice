@@ -1,34 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { ExternalIcon } from "@/components/ui/Icon";
 import type { SocietyWithCount } from "@/lib/queries";
 
-function SocietyAvatar({ name, logoUrl }: { name: string; logoUrl?: string | null }) {
-  const [err, setErr] = useState(false);
-
-  if (logoUrl && !err) {
-    return (
-      <img
-        src={logoUrl}
-        alt=""
-        width={40}
-        height={40}
-        onError={() => setErr(true)}
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 8,
-          objectFit: "contain",
-          background: "white",
-          padding: 3,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-          flexShrink: 0,
-        }}
-      />
-    );
-  }
+function SocietyAvatar({ name }: { name: string }) {
+  const initials = name
+    .replace(/^대한/, "")
+    .replace(/^한국/, "")
+    .replace(/학회$/, "")
+    .replace(/협회$/, "")
+    .slice(0, 2);
 
   return (
     <div
@@ -46,7 +28,7 @@ function SocietyAvatar({ name, logoUrl }: { name: string; logoUrl?: string | nul
         flexShrink: 0,
       }}
     >
-      {name.slice(2, 4)}
+      {initials || name.slice(0, 2)}
     </div>
   );
 }
@@ -79,7 +61,7 @@ export function SocietyGrid({ societies }: { societies: SocietyWithCount[] }) {
             }}
             className="card-hover"
           >
-            <SocietyAvatar name={s.name} logoUrl={s.logo_url} />
+            <SocietyAvatar name={s.name} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{

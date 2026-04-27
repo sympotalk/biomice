@@ -700,15 +700,23 @@ body {
   }
 }
 
-/* 소형 모바일 (≤420px) */
+/* 소형 모바일 (≤420px) — 학회 grid는 2열 유지 (myfair 스타일).
+   학술대회 카드(row)만 1열로 떨어짐. */
 @media (max-width: 420px) {
-  .bm-society-grid,
   .bm-card-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
   .bm-scroll-card {
     width: 220px;
+  }
+}
+
+/* 갤럭시 S25 등 360px viewport에서도 학회 카드 2열 정상 표시 위해
+   카드 내부 padding을 더 컴팩트하게 */
+@media (max-width: 380px) {
+  .bm-society-card {
+    padding: 10px 10px 8px;
   }
 }
 
