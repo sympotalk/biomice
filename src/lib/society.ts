@@ -322,3 +322,103 @@ export function specialtyColor(
   }
   return "var(--bm-primary)";
 }
+
+/**
+ * 학회명에서 진료과를 자동으로 추정.
+ * DB의 specialty 필드가 NULL인 학회 168개를 일괄 보강하기 위한 룰.
+ *
+ * 우선순위 — 더 구체적인 패턴이 먼저 매칭되어야 함.
+ * 예: "신경외과" 가 "외과"보다 먼저 체크되어야 정확.
+ */
+const SPECIALTY_RULES: Array<{ pattern: RegExp; specialty: string }> = [
+  // ── 신경 계열 (외과 매칭보다 먼저) ─────────────────────────────────────
+  { pattern: /신경외|뇌혈관내치료|뇌종양|두개저|척추신경외과|신경손상/, specialty: "신경외과" },
+  { pattern: /신경과|뇌졸중|치매|수면|두통|파킨슨|뇌전증|근전도|신경집중|연하장애|임상신경/, specialty: "신경과" },
+  { pattern: /뇌신경/, specialty: "기초의학" },
+
+  // ── 외과 세부 (외과 매칭보다 먼저) ─────────────────────────────────────
+  { pattern: /정형외과|골절|관절|수부|족부|근골격|미세수술|스포츠의학|골대사|척추외과/, specialty: "정형외과" },
+  { pattern: /성형외과|미용성형|두개안면성형/, specialty: "성형외과" },
+  { pattern: /흉부외과|심장혈관흉부/, specialty: "흉부외과" },
+  { pattern: /비뇨|남성과|전립선|배뇨/, specialty: "비뇨의학" },
+  { pattern: /이비인후|비과|이과|두경부|청각|기관식도|평형의학/, specialty: "이비인후과" },
+  { pattern: /산부인과|부인종양|모체태아|생식의학|여성건강/, specialty: "산부인과" },
+  { pattern: /소아|신생아/, specialty: "소아청소년과" },
+  { pattern: /간담췌외과|혈관외과|정맥|대장항문|내분비외과|이식|외상|화상|비만대사외과|종양외과|내시경로봇외과|소화기암|위암|간암|폐암/, specialty: "외과" },
+  { pattern: /^대한외과학회$|^한국외과/, specialty: "외과" },
+
+  // ── 내과 세부 ─────────────────────────────────────────────────────────
+  { pattern: /심장|순환기|심부전|부정맥|심혈관|심뇌혈관|심초음파/, specialty: "심장내과" },
+  { pattern: /당뇨|갑상선|내분비|비만(?!대사외과)/, specialty: "내과" },
+  { pattern: /류마티스/, specialty: "내과" },
+  { pattern: /신장|투석/, specialty: "내과" },
+  { pattern: /소화기|간학|췌장담도|장연구|상부위장관|헬리코박터/, specialty: "내과" },
+  { pattern: /호흡기|결핵|천식|알레르기/, specialty: "내과" },
+  { pattern: /감염|바이러스|백신|에이즈|화학요법|임상미생물|의진균|의료관련감염/, specialty: "내과" },
+  { pattern: /혈액|혈전지혈|조혈모세포이식/, specialty: "내과" },
+  { pattern: /종양내과|암학회|암예방|유방암/, specialty: "내과" },
+  { pattern: /노인병|고혈압|지질|동맥경화/, specialty: "내과" },
+  { pattern: /^대한내과학회$/, specialty: "내과" },
+
+  // ── 정신·재활 ─────────────────────────────────────────────────────────
+  { pattern: /정신|우울|조울|정신분석|신체의학|생물정신/, specialty: "정신의학" },
+  { pattern: /재활|연하/, specialty: "재활의학" },
+  { pattern: /통증/, specialty: "마취통증의학" },
+
+  // ── 안과·피부 ─────────────────────────────────────────────────────────
+  { pattern: /안과/, specialty: "안과" },
+  { pattern: /피부/, specialty: "피부과" },
+
+  // ── 응급·중환자·가정 ──────────────────────────────────────────────────
+  { pattern: /응급/, specialty: "응급의학" },
+  { pattern: /중환자/, specialty: "중환자의학" },
+  { pattern: /가정의학|가족/, specialty: "가정의학" },
+
+  // ── 마취·영상·핵의학·병리·진검 ────────────────────────────────────────
+  { pattern: /마취/, specialty: "마취통증의학" },
+  { pattern: /방사선종양/, specialty: "방사선종양학" },
+  { pattern: /영상의학|자기공명|초음파|복부영상|심혈관계영상/, specialty: "영상의학" },
+  { pattern: /핵의학/, specialty: "핵의학" },
+  { pattern: /병리|세포병리/, specialty: "병리과" },
+  { pattern: /진단검사|임상병리|임상화학|수혈|진단검사정도/, specialty: "진단검사의학" },
+
+  // ── 예방·산업·의료정책 ────────────────────────────────────────────────
+  { pattern: /예방의학|직업환경|산업의학|역학|의료질|의료윤리|항공우주|호스피스|완화의료/, specialty: "예방의학" },
+
+  // ── 기초·약리 ─────────────────────────────────────────────────────────
+  { pattern: /약리|약학|임상약리|임상독성/, specialty: "약리학" },
+  { pattern: /해부|생리|면역|미생물|기생충|법의|체질인류|의학유전|유전성대사|줄기세포|조직공학|재생의학|생화학분자|의용생체|의진균/, specialty: "기초의학" },
+
+  // ── 모학회·기타 ───────────────────────────────────────────────────────
+  { pattern: /의학회|의사학|의학교육|의료정보|의학레이저/, specialty: "의학" },
+  { pattern: /나학회/, specialty: "피부과" }, // 한센병
+];
+
+/**
+ * 학회명에서 진료과를 자동 추정한다.
+ * DB의 specialty가 NULL인 경우 fallback으로 사용 가능.
+ *
+ * @example
+ *   inferSpecialty("대한심장학회") → "심장내과"
+ *   inferSpecialty("대한정형외과학회") → "정형외과"
+ *   inferSpecialty("대한기초의학협회") → "기초의학"
+ */
+export function inferSpecialty(name: string): string | null {
+  for (const { pattern, specialty } of SPECIALTY_RULES) {
+    if (pattern.test(name)) return specialty;
+  }
+  return null;
+}
+
+/**
+ * specialty 우선순위:
+ *   1. DB 명시값 (society.specialty)
+ *   2. 학회명에서 추정 (inferSpecialty)
+ *   3. null
+ */
+export function resolveSpecialty(
+  name: string,
+  dbSpecialty: string | null | undefined,
+): string | null {
+  return dbSpecialty || inferSpecialty(name);
+}
