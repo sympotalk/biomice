@@ -23,17 +23,36 @@ import {
 export const runtime = "nodejs";
 export const maxDuration = 300; // 5분
 
-function isAuthorized(req: NextRequest): boolean {
-  const token = process.env.CRAWLER_TOKEN;
-  if (!token) return false;
-  const headerToken = req.headers.get("authorization")?.replace(/^Bearer /i, "");
-  const queryToken = new URL(req.url).searchParams.get("token");
-  return headerToken === token || queryToken === token;
+type AuthStatus = "ok" | "no-env" | "no-token" | "mismatch";
+
+function authStatus(req: NextRequest): AuthStatus {
+  const expected = process.env.CRAWLER_TOKEN?.trim();
+  if (!expected) return "no-env";
+
+  const headerToken = req.headers
+    .get("authorization")
+    ?.replace(/^Bearer /i, "")
+    .trim();
+  const queryToken = new URL(req.url).searchParams.get("token")?.trim();
+  const provided = headerToken || queryToken;
+  if (!provided) return "no-token";
+
+  return provided === expected ? "ok" : "mismatch";
 }
 
 async function handle(req: NextRequest) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const status = authStatus(req);
+  if (status !== "ok") {
+    const reason =
+      status === "no-env"
+        ? "CRAWLER_TOKEN 시크릿이 Cloudflare Worker에 설정되지 않았습니다. `npx wrangler secret put CRAWLER_TOKEN` 으로 등록 후 30초~1분 대기."
+        : status === "no-token"
+        ? "토큰이 제공되지 않았습니다. ?token= 쿼리 또는 Authorization: Bearer 헤더를 사용하세요."
+        : "토큰이 일치하지 않습니다. Cloudflare에 등록된 CRAWLER_TOKEN과 입력값이 정확히 같은지 확인하세요 (앞뒤 공백/줄바꿈 주의).";
+    return NextResponse.json(
+      { error: "unauthorized", code: status, reason },
+      { status: 401 },
+    );
   }
 
   const url = new URL(req.url);
