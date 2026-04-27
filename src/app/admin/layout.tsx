@@ -8,6 +8,7 @@ const NAV = [
   { href: "/admin/conferences", label: "학술대회" },
   { href: "/admin/banners", label: "배너 관리" },
   { href: "/admin/societies", label: "학회 관리" },
+  { href: "/admin/crawlers", label: "크롤러" },
 ];
 
 export default async function AdminLayout({
