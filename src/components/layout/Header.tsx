@@ -77,6 +77,9 @@ export function Header({ userEmail }: Props) {
             <Link href="/conferences" style={navLinkStyle}>
               학술대회
             </Link>
+            <Link href="/conferences?view=international" style={navLinkStyle}>
+              국제
+            </Link>
             <Link href="/societies" style={navLinkStyle}>
               학회
             </Link>
@@ -247,8 +250,14 @@ export function Header({ userEmail }: Props) {
               <div className="bm-drawer-section-title">메뉴</div>
               <DrawerLink
                 href="/conferences"
-                label="학술대회"
-                sub="전체 학술대회 목록"
+                label="국내 학술대회"
+                sub="대한의학회 등록 일정"
+                onClick={() => setOpen(false)}
+              />
+              <DrawerLink
+                href="/conferences?view=international"
+                label="국제 학술대회"
+                sub="ESC · AHA · ASCO 등 해외 일정"
                 onClick={() => setOpen(false)}
               />
               <DrawerLink

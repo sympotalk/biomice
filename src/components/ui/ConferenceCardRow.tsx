@@ -19,8 +19,32 @@ export type ConferenceCardRowProps = {
   favorite?: boolean;
   logoText?: string;
   logoColor?: string;
+  /** "international" 또는 "domestic". international일 때 국기 배지 표시. */
+  conferenceType?: string | null;
+  /** ISO 국가 코드 (US, ES, IT, KR 등). */
+  countryCode?: string | null;
+  /** KMA 등 인정 평점 (예: 6.0) */
+  cmeCredits?: number | null;
   /** Deprecated: 이미지 로고 사용 안 함 — 영문 약자 박스로 통일. */
   logoUrl?: string;
+};
+
+const COUNTRY_FLAG: Record<string, string> = {
+  KR: "🇰🇷",
+  US: "🇺🇸",
+  ES: "🇪🇸",
+  IT: "🇮🇹",
+  GB: "🇬🇧",
+  DE: "🇩🇪",
+  FR: "🇫🇷",
+  JP: "🇯🇵",
+  CN: "🇨🇳",
+  CH: "🇨🇭",
+  AT: "🇦🇹",
+  NL: "🇳🇱",
+  CA: "🇨🇦",
+  AU: "🇦🇺",
+  SG: "🇸🇬",
 };
 
 /**
@@ -42,8 +66,13 @@ export function ConferenceCardRow({
   favorite,
   logoText,
   logoColor,
+  conferenceType,
+  countryCode,
+  cmeCredits,
 }: ConferenceCardRowProps) {
   const isPast = dDay != null && dDay < 0;
+  const isIntl = conferenceType === "international";
+  const flag = countryCode ? COUNTRY_FLAG[countryCode] : null;
 
   // D-day 칩 스타일
   let dBg = "var(--bm-bg-muted)";
@@ -175,6 +204,26 @@ export function ConferenceCardRow({
             overflow: "hidden",
           }}
         >
+          {isIntl && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                height: 18,
+                padding: "0 6px",
+                background: "var(--bm-accent-subtle)",
+                color: "var(--bm-accent)",
+                borderRadius: 3,
+                fontSize: 10,
+                fontWeight: 700,
+                border: "1px solid var(--bm-accent-border)",
+                flexShrink: 0,
+              }}
+            >
+              {flag ? flag : "🌐"} 국제
+            </span>
+          )}
           {specialty && (
             <span
               style={{
@@ -190,6 +239,27 @@ export function ConferenceCardRow({
               }}
             >
               {specialty}
+            </span>
+          )}
+          {cmeCredits != null && cmeCredits > 0 && (
+            <span
+              className="mono-num"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                height: 18,
+                padding: "0 6px",
+                background: "var(--bm-success-subtle)",
+                color: "var(--bm-success)",
+                borderRadius: 3,
+                fontSize: 10,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+              aria-label="KMA 평점"
+            >
+              평점 {cmeCredits}
             </span>
           )}
           {dDay != null && (

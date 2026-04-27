@@ -74,6 +74,10 @@ export default async function ConferencesListPage({
   const isCalendar = sp.view === "calendar";
   const isFeatured = sp.view === "featured";
   const isUpcoming = sp.view === "upcoming";
+  const isInternational = sp.view === "international";
+  const conferenceType: "domestic" | "international" = isInternational
+    ? "international"
+    : "domestic";
 
   // 캘린더 뷰: 연/월 파라미터
   const now = new Date();
@@ -102,6 +106,7 @@ export default async function ConferencesListPage({
             dateFrom,
             dateTo,
             featured: isFeatured,
+            conferenceType,
             page,
             pageSize: PAGE_SIZE,
           }),
@@ -119,7 +124,9 @@ export default async function ConferencesListPage({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const title = isFeatured
-    ? "Featured 학술대회"
+    ? "주요 학술대회"
+    : isInternational
+    ? "국제 학술대회"
     : isUpcoming
     ? "이번 주 학술대회"
     : q

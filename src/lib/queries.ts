@@ -88,6 +88,7 @@ export async function listConferences(params: {
   dateFrom?: string; // YYYY-MM-DD
   dateTo?: string;   // YYYY-MM-DD
   featured?: boolean;
+  conferenceType?: "domestic" | "international" | "all";
   page?: number;
   pageSize?: number;
   from?: "upcoming" | "all";
@@ -127,10 +128,30 @@ export async function listConferences(params: {
   if (params.featured) {
     query = query.eq("is_featured", true);
   }
+  // 기본값: domestic만. international 또는 all 명시해야 국제 학술대회 포함.
+  if (params.conferenceType === "international") {
+    query = query.eq("conference_type", "international");
+  } else if (params.conferenceType !== "all") {
+    query = query.eq("conference_type", "domestic");
+  }
 
   const { data, count, error } = await query;
   if (error) throw error;
   return { rows: data ?? [], total: count ?? 0 };
+}
+
+/** 국제 학술대회만 — 데이터 부족 시 home에서 사용 */
+export async function listInternationalConferences(limit = 12): Promise<Conference[]> {
+  const sb = await createServerClient();
+  const { data, error } = await sb
+    .from("conferences")
+    .select("*")
+    .eq("conference_type", "international")
+    .gte("start_date", today())
+    .order("start_date", { ascending: true })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
 }
 
 /** 캘린더 뷰용: 특정 월의 모든 학술대회 (페이지네이션 없음) */

@@ -84,7 +84,7 @@ function CardFromRow({
   return (
     <ConferenceCard
       id={c.id}
-      title={c.event_name}
+      title={c.acronym ? `${c.acronym} · ${c.event_name}` : c.event_name}
       society={c.society_name}
       startDate={formatKoreanDate(c.start_date)}
       endDate={c.end_date ? formatKoreanDate(c.end_date) : undefined}
@@ -94,7 +94,7 @@ function CardFromRow({
       dDay={computeDDay(c.start_date)}
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
-      logoText={societyAbbr(c.society_name)}
+      logoText={c.acronym || societyAbbr(c.society_name)}
       logoColor={specialtyColor(c.category)}
       favorite={bookmarked}
     />
@@ -121,8 +121,11 @@ function RowFromConf({
       dDay={computeDDay(c.start_date)}
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
-      logoText={societyAbbr(c.society_name)}
+      logoText={c.acronym || societyAbbr(c.society_name)}
       logoColor={specialtyColor(c.category)}
+      conferenceType={c.conference_type}
+      countryCode={c.country_code}
+      cmeCredits={c.cme_credits}
       favorite={bookmarked}
     />
   );

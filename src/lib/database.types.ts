@@ -89,23 +89,72 @@ export type Database = {
           },
         ]
       }
+      cme_credit_sources: {
+        Row: {
+          approved_at: string | null
+          authority: string
+          category: string | null
+          conference_id: number | null
+          created_at: string | null
+          credits: number | null
+          id: number
+          source_url: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          authority?: string
+          category?: string | null
+          conference_id?: number | null
+          created_at?: string | null
+          credits?: number | null
+          id?: number
+          source_url?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          authority?: string
+          category?: string | null
+          conference_id?: number | null
+          created_at?: string | null
+          credits?: number | null
+          id?: number
+          source_url?: string | null
+        }
+        Relationships: []
+      }
       conferences: {
         Row: {
+          abstract_deadline: string | null
+          acronym: string | null
           category: string | null
           city: string | null
+          cme_credits: number | null
+          conference_type: string
+          country_code: string
+          country_name: string | null
           created_at: string
           description: string | null
           detail_url: string | null
+          early_bird_deadline: string | null
+          edition_year: number | null
           end_date: string | null
           event_name: string
           id: number
           is_deleted: boolean
           is_featured: boolean
           kams_id: string | null
+          lat: number | null
+          lng: number | null
+          mode: string
+          registration_deadline: string | null
           registration_url: string | null
+          related_kr_societies: number[] | null
+          series_id: number | null
           society_id: number | null
           society_name: string
           society_url: string | null
+          source_id: string | null
+          source_type: string
           sponsor_id: number | null
           start_date: string
           updated_at: string
@@ -113,21 +162,37 @@ export type Database = {
           view_count: number
         }
         Insert: {
+          abstract_deadline?: string | null
+          acronym?: string | null
           category?: string | null
           city?: string | null
+          cme_credits?: number | null
+          conference_type?: string
+          country_code?: string
+          country_name?: string | null
           created_at?: string
           description?: string | null
           detail_url?: string | null
+          early_bird_deadline?: string | null
+          edition_year?: number | null
           end_date?: string | null
           event_name: string
           id?: number
           is_deleted?: boolean
           is_featured?: boolean
           kams_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          mode?: string
+          registration_deadline?: string | null
           registration_url?: string | null
+          related_kr_societies?: number[] | null
+          series_id?: number | null
           society_id?: number | null
           society_name: string
           society_url?: string | null
+          source_id?: string | null
+          source_type?: string
           sponsor_id?: number | null
           start_date: string
           updated_at?: string
@@ -135,36 +200,74 @@ export type Database = {
           view_count?: number
         }
         Update: {
+          abstract_deadline?: string | null
+          acronym?: string | null
           category?: string | null
           city?: string | null
+          cme_credits?: number | null
+          conference_type?: string
+          country_code?: string
+          country_name?: string | null
           created_at?: string
           description?: string | null
           detail_url?: string | null
+          early_bird_deadline?: string | null
+          edition_year?: number | null
           end_date?: string | null
           event_name?: string
           id?: number
           is_deleted?: boolean
           is_featured?: boolean
           kams_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          mode?: string
+          registration_deadline?: string | null
           registration_url?: string | null
+          related_kr_societies?: number[] | null
+          series_id?: number | null
           society_id?: number | null
           society_name?: string
           society_url?: string | null
+          source_id?: string | null
+          source_type?: string
           sponsor_id?: number | null
           start_date?: string
           updated_at?: string
           venue?: string | null
           view_count?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "conferences_society_id_fkey"
-            columns: ["society_id"]
-            isOneToOne: false
-            referencedRelation: "societies"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      event_series: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          name_en: string | null
+          name_ko: string | null
+          organizer: string | null
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name_en?: string | null
+          name_ko?: string | null
+          organizer?: string | null
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name_en?: string | null
+          name_ko?: string | null
+          organizer?: string | null
+          slug?: string
+        }
+        Relationships: []
       }
       notification_log: {
         Row: {
@@ -188,15 +291,7 @@ export type Database = {
           sent_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "notification_log_conference_id_fkey"
-            columns: ["conference_id"]
-            isOneToOne: false
-            referencedRelation: "conferences"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       societies: {
         Row: {
@@ -322,3 +417,5 @@ export type UsersProfile = Database["public"]["Tables"]["users_profile"]["Row"]
 export type NotificationLog = Database["public"]["Tables"]["notification_log"]["Row"]
 export type Society = Database["public"]["Tables"]["societies"]["Row"]
 export type Sponsor = Database["public"]["Tables"]["sponsors"]["Row"]
+export type EventSeries = Database["public"]["Tables"]["event_series"]["Row"]
+export type CmeCreditSource = Database["public"]["Tables"]["cme_credit_sources"]["Row"]

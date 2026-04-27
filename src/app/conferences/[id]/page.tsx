@@ -342,6 +342,87 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             )}
           </div>
 
+          {/* CME 평점 / 마감 정보 */}
+          {(conf.cme_credits ||
+            conf.registration_deadline ||
+            conf.early_bird_deadline ||
+            conf.abstract_deadline) && (
+            <div
+              style={{
+                background: "var(--bm-surface)",
+                border: "1px solid var(--bm-border)",
+                borderRadius: 8,
+                padding: 16,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--bm-text-tertiary)",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                }}
+              >
+                인정 점수 / 마감일
+              </h3>
+              {conf.cme_credits && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "8px 10px",
+                    background: "var(--bm-success-subtle)",
+                    borderRadius: 6,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "var(--bm-text-secondary)",
+                    }}
+                  >
+                    KMA 평점
+                  </span>
+                  <span
+                    className="mono-num"
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 800,
+                      color: "var(--bm-success)",
+                    }}
+                  >
+                    {conf.cme_credits} 점
+                  </span>
+                </div>
+              )}
+              {conf.abstract_deadline && (
+                <DeadlineRow
+                  label="초록 마감"
+                  date={conf.abstract_deadline}
+                />
+              )}
+              {conf.early_bird_deadline && (
+                <DeadlineRow
+                  label="얼리버드"
+                  date={conf.early_bird_deadline}
+                />
+              )}
+              {conf.registration_deadline && (
+                <DeadlineRow
+                  label="사전등록 마감"
+                  date={conf.registration_deadline}
+                  emphasize
+                />
+              )}
+            </div>
+          )}
+
           {/* 위치 / 지도 */}
           {conf.venue && (
             <div
@@ -722,5 +803,79 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
         dDay={dd}
       />
     </>
+  );
+}
+
+function DeadlineRow({
+  label,
+  date,
+  emphasize,
+}: {
+  label: string;
+  date: string;
+  emphasize?: boolean;
+}) {
+  const deadline = new Date(date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const daysLeft = Math.ceil(
+    (deadline.getTime() - today.getTime()) / 86400000,
+  );
+  const isPast = daysLeft < 0;
+  const isUrgent = !isPast && daysLeft <= 7;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
+        opacity: isPast ? 0.5 : 1,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          color: emphasize
+            ? "var(--bm-text-primary)"
+            : "var(--bm-text-secondary)",
+          fontWeight: emphasize ? 600 : 400,
+        }}
+      >
+        {label}
+      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span
+          className="mono-num"
+          style={{
+            fontSize: 12,
+            color: "var(--bm-text-primary)",
+            fontWeight: emphasize ? 700 : 500,
+          }}
+        >
+          {formatKoreanDate(date)}
+        </span>
+        {!isPast && (
+          <span
+            className="mono-num"
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              padding: "1px 6px",
+              borderRadius: 3,
+              background: isUrgent
+                ? "var(--bm-danger-subtle)"
+                : "var(--bm-bg-muted)",
+              color: isUrgent
+                ? "var(--bm-danger)"
+                : "var(--bm-text-secondary)",
+            }}
+          >
+            {daysLeft === 0 ? "D-DAY" : `D-${daysLeft}`}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
