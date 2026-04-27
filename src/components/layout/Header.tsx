@@ -77,12 +77,6 @@ export function Header({ userEmail }: Props) {
             <Link href="/conferences" style={navLinkStyle}>
               학술대회
             </Link>
-            <Link href="/conferences?view=upcoming" style={navLinkStyle}>
-              이번 주
-            </Link>
-            <Link href="/conferences?view=featured" style={navLinkStyle}>
-              Featured
-            </Link>
             <Link href="/societies" style={navLinkStyle}>
               학회
             </Link>
@@ -254,33 +248,42 @@ export function Header({ userEmail }: Props) {
               <DrawerLink
                 href="/conferences"
                 label="학술대회"
-                sub="전체 목록"
-                onClick={() => setOpen(false)}
-              />
-              <DrawerLink
-                href="/conferences?view=upcoming"
-                label="이번 주"
-                sub="D-7 이내"
-                onClick={() => setOpen(false)}
-              />
-              <DrawerLink
-                href="/conferences?view=featured"
-                label="Featured"
-                sub="주요 학술대회"
+                sub="전체 학술대회 목록"
                 onClick={() => setOpen(false)}
               />
               <DrawerLink
                 href="/societies"
                 label="학회"
-                sub="국내 의학회"
+                sub="국내 의학 학회"
                 onClick={() => setOpen(false)}
               />
               <DrawerLink
                 href="/pharma"
-                label="제약사"
-                sub="광고 문의"
+                label="제약사 광고 문의"
+                sub="배너·스폰서십 안내"
                 onClick={() => setOpen(false)}
                 accent
+              />
+
+              {/* 빠른 접근 */}
+              <div className="bm-drawer-section-title">빠른 접근</div>
+              <DrawerLink
+                href="/conferences?view=upcoming"
+                label="이번 주 학술대회"
+                sub="D-7 이내 임박 일정"
+                onClick={() => setOpen(false)}
+              />
+              <DrawerLink
+                href="/conferences?view=featured"
+                label="주요 학술대회"
+                sub="에디터 추천 / 주목 학회"
+                onClick={() => setOpen(false)}
+              />
+              <DrawerLink
+                href="/conferences?view=calendar"
+                label="캘린더 뷰"
+                sub="월별 일정 한눈에"
+                onClick={() => setOpen(false)}
               />
 
               {isAdmin && (
