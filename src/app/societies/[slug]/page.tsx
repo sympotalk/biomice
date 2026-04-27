@@ -76,35 +76,32 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
 
         {/* 학회 헤더 카드 */}
         <section
+          className="bm-society-detail-hero"
           style={{
             background: "var(--bm-surface)",
             border: "1px solid var(--bm-border)",
             borderRadius: 12,
             padding: "20px",
             marginBottom: 24,
-            display: "flex",
-            gap: 16,
-            alignItems: "flex-start",
-            flexWrap: "wrap",
             width: "100%",
             maxWidth: "100%",
             minWidth: 0,
-            overflow: "hidden",
             boxSizing: "border-box",
           }}
         >
-          {/* 아바타 (영문 약자 박스) */}
+          {/* Row 1: 아바타 + 학회명/정보 (모바일에서도 한 줄) */}
+          <div className="bm-society-detail-row1">
           <div
             style={{
-              width: 72,
-              height: 72,
+              width: 64,
+              height: 64,
               borderRadius: 14,
               background: specialtyColor(society.specialty),
               color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: societyAbbr(society.name).length > 4 ? 14 : 16,
+              fontSize: societyAbbr(society.name).length > 4 ? 12 : 14,
               fontFamily: "var(--font-mono)",
               fontWeight: 800,
               letterSpacing: 0.5,
@@ -123,6 +120,9 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
                   fontWeight: 700,
                   letterSpacing: -0.4,
                   color: "var(--bm-text-primary)",
+                  wordBreak: "keep-all",
+                  overflowWrap: "anywhere",
+                  maxWidth: "100%",
                 }}
               >
                 {society.name}
@@ -197,6 +197,7 @@ export default async function SocietyDetailPage({ params }: { params: Params }) 
               )}
             </div>
           </div>
+          </div>{/* /row1 */}
 
           {/* 통계 */}
           <div

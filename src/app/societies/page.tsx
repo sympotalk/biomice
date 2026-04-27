@@ -19,14 +19,15 @@ export default async function SocietiesPage() {
       <Header />
 
       {/* ── Hero bar ─────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          borderBottom: "1px solid var(--bm-border)",
-          background: "var(--bm-bg)",
-          padding: "28px 24px 24px",
-        }}
-      >
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+      <div className="bm-list-hero">
+        <div
+          style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            width: "100%",
+            minWidth: 0,
+          }}
+        >
           <h1
             style={{
               margin: "0 0 6px",
@@ -48,7 +49,10 @@ export default async function SocietiesPage() {
         </div>
       </div>
 
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 20px 72px" }}>
+      <main
+        className="bm-main"
+        style={{ paddingTop: 24, paddingBottom: 72 }}
+      >
         <SocietyList societies={societies} />
       </main>
 

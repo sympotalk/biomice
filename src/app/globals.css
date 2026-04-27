@@ -377,6 +377,40 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════
+   학회 상세 페이지 hero
+   모바일에서 stats 박스가 학회명 column을 짜그라뜨리지 않게
+   ════════════════════════════════════════════════════════════ */
+
+.bm-society-detail-hero {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+@media (max-width: 768px) {
+  .bm-society-detail-hero {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+  }
+  /* 자식이 부모 width 안에 들어가도록 (avatar는 자체 width 유지) */
+  .bm-society-detail-hero > * {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* 학회 상세 hero 안의 sub-flex (avatar + 학회명) */
+.bm-society-detail-row1 {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ════════════════════════════════════════════════════════════
    AD BANNER (반응형 padding/logo/title)
    ════════════════════════════════════════════════════════════ */
 
