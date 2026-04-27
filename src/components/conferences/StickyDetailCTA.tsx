@@ -6,6 +6,7 @@ type Props = {
   conferenceId: number;
   isBookmarked: boolean;
   registrationUrl?: string | null;
+  dDay?: number | null;
 };
 
 /**
@@ -17,10 +18,19 @@ export function StickyDetailCTA({
   conferenceId,
   isBookmarked,
   registrationUrl,
+  dDay,
 }: Props) {
+  const isUrgent = dDay !== null && dDay !== undefined && dDay >= 0 && dDay <= 7;
   return (
     <div className="bm-show-mobile">
-      <div className="bm-sticky-cta">
+      <div
+        className="bm-sticky-cta"
+        style={{
+          borderTop: isUrgent
+            ? "2px solid var(--bm-danger)"
+            : "1px solid var(--bm-border)",
+        }}
+      >
       <div
         style={{
           width: 44,
@@ -82,7 +92,7 @@ export function StickyDetailCTA({
             height: 44,
             borderRadius: 8,
             border: "none",
-            background: "var(--bm-primary)",
+            background: isUrgent ? "var(--bm-danger)" : "var(--bm-primary)",
             color: "#fff",
             fontSize: 14,
             fontWeight: 700,
@@ -91,8 +101,23 @@ export function StickyDetailCTA({
             justifyContent: "center",
             gap: 6,
             textDecoration: "none",
+            animation: isUrgent ? "bm-pulse 2s ease-in-out infinite" : undefined,
           }}
         >
+          {isUrgent && dDay !== null && dDay !== undefined && (
+            <span
+              className="mono-num"
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                background: "rgba(255,255,255,0.25)",
+                padding: "2px 6px",
+                borderRadius: 4,
+              }}
+            >
+              {dDay === 0 ? "D-DAY" : `D-${dDay}`}
+            </span>
+          )}
           사전등록 하러 가기
           <svg
             width="13"

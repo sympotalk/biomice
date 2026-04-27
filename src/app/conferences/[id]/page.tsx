@@ -18,6 +18,7 @@ import {
   formatKoreanDate,
   isRegistrationOpen,
 } from "@/lib/dates";
+import { societyAbbr, specialtyColor, resolveSpecialty } from "@/lib/society";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -227,16 +228,225 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
         </div>
       </section>
 
-      {/* ── 2-column body ────────────────────────────────────────────────── */}
-      <div
-        className="bm-detail-grid"
-        style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "32px 24px 64px",
-        }}
-      >
-        {/* ── Left column ─────────────────────────────────────────────────── */}
+      {/* ── 3-column body (데스크톱) ────────────────────────────────────── */}
+      <div className="bm-detail-grid">
+        {/* ── 좌측 메타 (학회 정보 + 지도 + 태그) ───────────────────────── */}
+        <aside
+          className="bm-detail-meta"
+          style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}
+        >
+          {/* 학회 카드 */}
+          <div
+            style={{
+              background: "var(--bm-surface)",
+              border: "1px solid var(--bm-border)",
+              borderRadius: 8,
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 8,
+                  background: specialtyColor(resolveSpecialty(conf.society_name, null)),
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "var(--font-mono)",
+                  fontWeight: 800,
+                  fontSize: societyAbbr(conf.society_name).length >= 5 ? 10 : societyAbbr(conf.society_name).length === 4 ? 12 : 14,
+                  letterSpacing: 0.3,
+                  flexShrink: 0,
+                }}
+              >
+                {societyAbbr(conf.society_name)}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--bm-text-tertiary)",
+                    marginBottom: 2,
+                  }}
+                >
+                  주최 학회
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "var(--bm-text-primary)",
+                    lineHeight: 1.35,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {conf.society_name}
+                </div>
+              </div>
+            </div>
+            {(conf.category || resolveSpecialty(conf.society_name, conf.category)) && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {[
+                  resolveSpecialty(conf.society_name, conf.category),
+                  conf.category && conf.category !== resolveSpecialty(conf.society_name, null)
+                    ? conf.category
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .map((tag) => (
+                    <span
+                      key={tag as string}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        height: 20,
+                        padding: "0 8px",
+                        background: "var(--bm-primary-subtle)",
+                        color: "var(--bm-primary)",
+                        borderRadius: 4,
+                        fontSize: 11,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+              </div>
+            )}
+            {conf.society_url && (
+              <a
+                href={conf.society_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: 12,
+                  color: "var(--bm-primary)",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                }}
+              >
+                학회 홈페이지
+                <ExternalIcon width={11} height={11} />
+              </a>
+            )}
+          </div>
+
+          {/* 위치 / 지도 */}
+          {conf.venue && (
+            <div
+              style={{
+                background: "var(--bm-surface)",
+                border: "1px solid var(--bm-border)",
+                borderRadius: 8,
+                overflow: "hidden",
+              }}
+            >
+              {/* 지도 placeholder — Google Maps embed (API key 불필요한 형식) */}
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `${conf.venue} ${conf.city ?? ""}`.trim(),
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "block",
+                  height: 120,
+                  background:
+                    "linear-gradient(135deg, var(--bm-bg-muted) 0%, var(--bm-primary-subtle) 100%)",
+                  position: "relative",
+                  textDecoration: "none",
+                }}
+                aria-label="지도에서 보기"
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <svg
+                    width="36"
+                    height="36"
+                    viewBox="0 0 36 36"
+                    fill="none"
+                    stroke="var(--bm-primary)"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 4c-5.5 0-10 4-10 9 0 7 10 19 10 19s10-12 10-19c0-5-4.5-9-10-9z" />
+                    <circle cx="18" cy="13" r="3" />
+                  </svg>
+                </div>
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: 8,
+                    right: 10,
+                    fontSize: 10,
+                    color: "var(--bm-primary)",
+                    fontWeight: 600,
+                    background: "rgba(255,255,255,0.9)",
+                    padding: "3px 8px",
+                    borderRadius: 999,
+                  }}
+                >
+                  지도 보기 →
+                </span>
+              </a>
+              <div style={{ padding: 14 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--bm-text-tertiary)",
+                    marginBottom: 4,
+                  }}
+                >
+                  개최 장소
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--bm-text-primary)",
+                    lineHeight: 1.4,
+                    wordBreak: "keep-all",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {conf.venue}
+                </div>
+                {conf.city && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "var(--bm-text-secondary)",
+                      marginTop: 2,
+                    }}
+                  >
+                    {conf.city}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* ── 중앙 콘텐츠 ─────────────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
 
           {/* 일정 정보 */}
@@ -316,15 +526,45 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
           }}
         >
 
-          {/* CTA card */}
+          {/* CTA card — 마감 임박일 때 강조 (D-7 이하 + 사전등록 가능) */}
           <div
             style={{
+              position: "relative",
               background: "var(--bm-surface)",
-              border: "1px solid var(--bm-border)",
+              border:
+                dd !== null && dd <= 7 && dd >= 0 && conf.registration_url
+                  ? "2px solid var(--bm-danger)"
+                  : "1px solid var(--bm-border)",
               borderRadius: 8,
               padding: 20,
+              boxShadow:
+                dd !== null && dd <= 7 && dd >= 0 && conf.registration_url
+                  ? "0 4px 16px rgba(199, 62, 62, 0.15)"
+                  : undefined,
             }}
           >
+            {dd !== null && dd <= 7 && dd >= 0 && conf.registration_url && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: -10,
+                  left: 16,
+                  height: 22,
+                  padding: "0 10px",
+                  background: "var(--bm-danger)",
+                  color: "#fff",
+                  borderRadius: 999,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  animation: "bm-pulse 2s ease-in-out infinite",
+                }}
+              >
+                🔥 사전등록 임박
+              </div>
+            )}
             <div
               style={{
                 display: "flex",
@@ -334,7 +574,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               }}
             >
               <div style={{ fontSize: 12, color: "var(--bm-text-tertiary)" }}>
-                {dd !== null && dd <= 7 && dd >= 0 ? "사전등록 임박" : "개최일"}
+                {dd !== null && dd <= 7 && dd >= 0 ? "마감 D-7 이내" : "개최일"}
               </div>
               <DDayBadge days={dd} />
             </div>
@@ -479,6 +719,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
         conferenceId={conf.id}
         isBookmarked={isBookmarked}
         registrationUrl={conf.registration_url}
+        dDay={dd}
       />
     </>
   );

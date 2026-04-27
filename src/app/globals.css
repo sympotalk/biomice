@@ -289,15 +289,35 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
-/* 학술대회 상세 2단 */
+/* 학술대회 상세 3단 (데스크톱) — 좌(메타/지도) · 중(콘텐츠) · 우(sticky CTA) */
 .bm-detail-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 32px;
+  grid-template-columns: 240px minmax(0, 1fr) 320px;
+  gap: 24px;
   align-items: start;
   max-width: 1280px;
   margin: 0 auto;
   padding: 32px 24px 64px;
+}
+
+/* 태블릿 — 좌측 메타를 빼고 2열 */
+@media (max-width: 1100px) {
+  .bm-detail-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 20px;
+  }
+  /* 좌측(첫 번째 column) 콘텐츠를 본문 위로 inline */
+  .bm-detail-grid > .bm-detail-meta {
+    grid-column: 1 / -1;
+    order: -1;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .bm-detail-grid > .bm-detail-meta > * {
+    flex: 1;
+    min-width: 200px;
+  }
 }
 
 /* 학술대회 목록 사이드바 */
