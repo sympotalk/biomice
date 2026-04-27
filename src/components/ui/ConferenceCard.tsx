@@ -23,6 +23,7 @@ export type ConferenceCardProps = {
   compact?: boolean;
   logoText?: string;
   logoColor?: string;
+  /** Deprecated: 이미지 로고 사용 안 함. 영문 약자 박스로 통일. */
   logoUrl?: string;
   href?: string;
 };
@@ -43,11 +44,9 @@ export function ConferenceCard({
   compact,
   logoText,
   logoColor,
-  logoUrl,
   href,
 }: ConferenceCardProps) {
   const [hov, setHov] = useState(false);
-  const [logoErr, setLogoErr] = useState(false);
   const destination = href ?? `/conferences/${id}`;
 
   return (
@@ -93,42 +92,38 @@ export function ConferenceCard({
         <div style={{ position: "absolute", top: 8, right: 8 }}>
           <FavoriteHeart active={favorite} conferenceId={id} size={32} />
         </div>
-        {logoUrl && !logoErr ? (
-          <img
-            src={logoUrl}
-            alt=""
-            width={48}
-            height={48}
-            onError={() => setLogoErr(true)}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 8,
-              objectFit: "contain",
-              background: "white",
-              padding: 4,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 8,
-              background: logoColor || "var(--bm-primary)",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-mono)",
-              fontWeight: 700,
-              fontSize: 18,
-            }}
-          >
-            {logoText || (society || "KM").slice(0, 2).toUpperCase()}
-          </div>
-        )}
+        {/* 학회 로고 — 영문 약자 박스 (이미지 사용 안 함) */}
+        {(() => {
+          const initials = logoText || society.slice(0, 2);
+          const isEnglish = /^[A-Z0-9-]+$/.test(initials);
+          const fs = isEnglish
+            ? initials.length >= 5
+              ? 12
+              : initials.length === 4
+              ? 14
+              : 18
+            : 18;
+          return (
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 10,
+                background: logoColor || "var(--bm-primary)",
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: "var(--font-mono)",
+                fontWeight: 800,
+                fontSize: fs,
+                letterSpacing: 0.3,
+              }}
+            >
+              {initials}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Body */}

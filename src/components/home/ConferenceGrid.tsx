@@ -1,6 +1,7 @@
 import { ConferenceCard } from "@/components/ui/ConferenceCard";
 import { ConferenceCardRow } from "@/components/ui/ConferenceCardRow";
 import { formatKoreanDate, computeDDay, isRegistrationOpen } from "@/lib/dates";
+import { societyAbbr, specialtyColor } from "@/lib/society";
 import type { Conference } from "@/lib/database.types";
 
 type Props = {
@@ -93,7 +94,8 @@ function CardFromRow({
       dDay={computeDDay(c.start_date)}
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
-      logoText={societyShort(c.society_name)}
+      logoText={societyAbbr(c.society_name)}
+      logoColor={specialtyColor(c.category)}
       favorite={bookmarked}
     />
   );
@@ -119,18 +121,9 @@ function RowFromConf({
       dDay={computeDDay(c.start_date)}
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
-      logoText={societyShort(c.society_name)}
+      logoText={societyAbbr(c.society_name)}
+      logoColor={specialtyColor(c.category)}
       favorite={bookmarked}
     />
   );
-}
-
-function societyShort(society: string): string {
-  // "대한XX학회" → "XX", "한국XX협회" → "XX" 등
-  const cleaned = society
-    .replace(/^대한/, "")
-    .replace(/^한국/, "")
-    .replace(/학회$/, "")
-    .replace(/협회$/, "");
-  return (cleaned || society).slice(0, 2);
 }

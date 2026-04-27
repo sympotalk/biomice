@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { CalendarIcon, PinIcon } from "./Icon";
 import { FavoriteHeart } from "./FavoriteHeart";
 
@@ -20,6 +19,7 @@ export type ConferenceCardRowProps = {
   favorite?: boolean;
   logoText?: string;
   logoColor?: string;
+  /** Deprecated: 이미지 로고 사용 안 함 — 영문 약자 박스로 통일. */
   logoUrl?: string;
 };
 
@@ -42,9 +42,7 @@ export function ConferenceCardRow({
   favorite,
   logoText,
   logoColor,
-  logoUrl,
 }: ConferenceCardRowProps) {
-  const [logoErr, setLogoErr] = useState(false);
   const isPast = dDay != null && dDay < 0;
 
   // D-day 칩 스타일
@@ -85,7 +83,16 @@ export function ConferenceCardRow({
 
   const venueLine = [venue, city].filter(Boolean).join(" · ");
 
-  const initials = (logoText || society || "KM").slice(0, 3).toUpperCase();
+  // 영문 약자 (KAIM, KSCVS 등) 또는 한글 fallback. 길이에 따라 폰트 자동 축소.
+  const initials = logoText || society.slice(0, 2);
+  const isEnglish = /^[A-Z0-9-]+$/.test(initials);
+  const initialFontSize = isEnglish
+    ? initials.length >= 5
+      ? 9
+      : initials.length === 4
+      ? 11
+      : 13
+    : 13;
 
   return (
     <Link
@@ -132,30 +139,19 @@ export function ConferenceCardRow({
           height: 48,
           flexShrink: 0,
           borderRadius: 8,
-          background: logoUrl && !logoErr ? "#fff" : (logoColor || "var(--bm-primary)"),
+          background: logoColor || "var(--bm-primary)",
           color: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontFamily: "var(--font-mono)",
-          fontWeight: 700,
-          fontSize: 13,
+          fontWeight: 800,
+          fontSize: initialFontSize,
           letterSpacing: 0.3,
           overflow: "hidden",
-          border: logoUrl && !logoErr ? "1px solid var(--bm-border)" : "none",
         }}
       >
-        {logoUrl && !logoErr ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={logoUrl}
-            alt=""
-            onError={() => setLogoErr(true)}
-            style={{ width: "100%", height: "100%", objectFit: "contain", padding: 4 }}
-          />
-        ) : (
-          initials
-        )}
+        {initials}
       </div>
 
       {/* 우측 정보 */}
