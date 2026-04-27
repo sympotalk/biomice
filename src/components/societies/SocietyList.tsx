@@ -100,7 +100,15 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
           }}
         >
           <SocietyLogo name={s.name} logoUrl={s.logo_url} />
-          <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              maxWidth: "100%",
+              overflow: "hidden",
+              paddingTop: 2,
+            }}
+          >
             <div
               style={{
                 fontSize: 13,
@@ -112,7 +120,8 @@ function SocietyCard({ s }: { s: SocietyWithCount }) {
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 marginBottom: 6,
-                wordBreak: "keep-all",
+                wordBreak: "break-word",
+                overflowWrap: "anywhere",
               }}
             >
               {s.name}

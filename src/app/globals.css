@@ -249,14 +249,21 @@ body {
    GRIDS
    ════════════════════════════════════════════════════════════ */
 
-/* 학회 목록 */
+/* 학회 목록.
+   minmax(0, 1fr) 트릭: grid item의 default min-width: auto는 자식 콘텐츠
+   기준이라 한국어 nowrap/keep-all 텍스트가 1fr 약속을 깰 수 있다.
+   minmax(0, 1fr)로 명시하면 column이 콘텐츠 무관하게 정확히 1fr만 차지. */
 .bm-society-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
 }
 .bm-society-card {
   padding: 20px 18px 16px;
+  overflow: hidden;
+  min-width: 0;
 }
 
 /* 학술대회 카드 그리드 (auto-responsive via minmax) */
@@ -576,7 +583,7 @@ body {
 /* 태블릿 (≤1024px) */
 @media (max-width: 1024px) {
   .bm-society-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .bm-detail-grid {
     grid-template-columns: 1fr 300px;
@@ -609,7 +616,7 @@ body {
 
   /* 학회 그리드: 2열 */
   .bm-society-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
   .bm-society-card {
@@ -697,7 +704,7 @@ body {
 @media (max-width: 420px) {
   .bm-society-grid,
   .bm-card-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
   .bm-scroll-card {
