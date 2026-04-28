@@ -34,18 +34,19 @@
   /**
    * Cron Triggers — 국제 학술대회 크롤러 자동 실행.
    *
-   *   "0 18 * * 0"   = 매주 일요일 18:00 UTC = 한국 시간 월요일 03:00
+   *   "0 18 * * SUN" = 매주 일요일 18:00 UTC = 한국 시간 월요일 03:00
    *                    (한국 새벽 시간이라 사용자 트래픽 영향 최소)
    *
-   * Cron 발생 시 OpenNext worker의 scheduled 핸들러가 호출됨. 별도 worker
-   * 분리 대신 worker.js의 scheduled() 안에서 fetch로 /api/cron/intl 호출.
-   * (OpenNext.js Cloudflare 어댑터가 scheduled 핸들러를 자동 export)
+   * NOTE: Cloudflare Cron Triggers는 day-of-week에 숫자 0을 허용하지 않음.
+   * 1-7 또는 SUN/MON/TUE/WED/THU/FRI/SAT 사용 필수. 그래서 "* * 0"이 아닌
+   * "* * SUN".
    *
-   * 인증: /api/cron/intl 엔드포인트는 CRAWLER_TOKEN 시크릿으로 보호됨.
-   * cron이 호출 시 env.CRAWLER_TOKEN을 query param으로 전달.
+   * Cron 발생 시 OpenNext worker의 scheduled 핸들러가 호출됨. 인증은
+   * /api/cron/intl 엔드포인트의 CRAWLER_TOKEN 시크릿으로 처리.
+   * 관리자 페이지(/admin/crawlers)에서는 server action 직접 호출이라 토큰 불필요.
    */
   "triggers": {
-    "crons": ["0 18 * * 0"]
+    "crons": ["0 18 * * SUN"]
   },
 
   /**

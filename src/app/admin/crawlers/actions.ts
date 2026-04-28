@@ -3,6 +3,52 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/admin";
+import { getAdapter } from "@/lib/crawler/intl/registry";
+import { runIntlCrawler, runAllIntlCrawlers } from "@/lib/crawler/intl/runner";
+import type { CrawlResult } from "@/lib/crawler/intl/types";
+
+/**
+ * 관리자 페이지에서 어댑터를 직접 실행. CRAWLER_TOKEN 불필요.
+ * Supabase admin 세션이면 통과. (Cron Trigger는 /api/cron/intl + 토큰 사용)
+ */
+export async function runCrawlerAction(
+  sourceKey: string | null,
+  dryRun: boolean,
+): Promise<
+  | { ok: true; dryRun: boolean; result?: CrawlResult; results?: CrawlResult[] }
+  | { ok: false; error: string }
+> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { ok: false, error: "관리자 권한이 필요합니다" };
+  }
+
+  try {
+    if (sourceKey) {
+      const adapter = getAdapter(sourceKey);
+      if (!adapter) {
+        return { ok: false, error: `unknown source: ${sourceKey}` };
+      }
+      const result = await runIntlCrawler(adapter, { dryRun });
+      // 결과가 DB에 반영되었으면 리스트 캐시 무효화
+      if (!dryRun && result.inserted + result.updated > 0) {
+        revalidatePath("/admin/crawlers");
+        revalidatePath("/conferences");
+      }
+      return { ok: true, dryRun, result };
+    }
+
+    const results = await runAllIntlCrawlers({ dryRun });
+    if (!dryRun) {
+      revalidatePath("/admin/crawlers");
+      revalidatePath("/conferences");
+    }
+    return { ok: true, dryRun, results };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
 
 /**
  * 학술대회의 manual 필드 (cme_credits_kr / related_korean_society / is_kams_certified)
