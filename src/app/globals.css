@@ -95,8 +95,8 @@ input, button, select, textarea {
   --bm-radius-card: 8px;
   --bm-radius-pill: 999px;
 
-  /* Layout */
-  --bm-header-h: 64px;
+  /* Layout — 데스크톱 80px (myfair.co 스타일) */
+  --bm-header-h: 80px;
   --bm-header-h-mobile: 56px;
 }
 
@@ -221,11 +221,26 @@ body {
 .bm-header-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 28px;
   height: var(--bm-header-h);
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 32px;
+}
+
+/* myfair.co 스타일 — 큰 로고 (데스크톱 38px / 모바일 24px) */
+.bm-header-logo img { height: 38px; }
+@media (max-width: 768px) {
+  .bm-header-logo img { height: 24px; }
+}
+
+/* 메뉴 간격 — 데스크톱 36px (myfair.co 비슷한 spacing) */
+.bm-header-nav {
+  gap: 36px;
+}
+.bm-header-nav a {
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .bm-main {

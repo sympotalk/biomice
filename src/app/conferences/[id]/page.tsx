@@ -163,7 +163,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               <h1
                 style={{
                   margin: 0,
-                  fontSize: "clamp(22px, 4vw, 34px)",
+                  fontSize: "clamp(24px, 4.5vw, 38px)",
                   fontWeight: 800,
                   letterSpacing: -0.8,
                   lineHeight: 1.2,
@@ -293,16 +293,17 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
+                    fontWeight: 600,
                     color: "var(--bm-text-tertiary)",
-                    marginBottom: 2,
+                    marginBottom: 4,
                   }}
                 >
                   주최 학회
                 </div>
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: 700,
                     color: "var(--bm-text-primary)",
                     lineHeight: 1.35,
@@ -316,7 +317,7 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               </div>
             </div>
             {(conf.category || resolveSpecialty(conf.society_name, conf.category)) && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {[
                   resolveSpecialty(conf.society_name, conf.category),
                   conf.category && conf.category !== resolveSpecialty(conf.society_name, null)
@@ -330,12 +331,12 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
-                        height: 20,
-                        padding: "0 8px",
+                        height: 24,
+                        padding: "0 10px",
                         background: "var(--bm-primary-subtle)",
                         color: "var(--bm-primary)",
                         borderRadius: 4,
-                        fontSize: 11,
+                        fontSize: 13,
                         fontWeight: 600,
                       }}
                     >
@@ -353,9 +354,9 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 4,
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--bm-primary)",
-                  fontWeight: 500,
+                  fontWeight: 600,
                   textDecoration: "none",
                 }}
               >
@@ -456,76 +457,80 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 overflow: "hidden",
               }}
             >
-              {/* 지도 placeholder — Google Maps embed (API key 불필요한 형식) */}
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              {/* 지도 — OpenStreetMap iframe (API 키 불필요) + 네이버 지도 외부 링크.
+                   conf.lat/lng가 있으면 정확한 marker, 없으면 도시 광역 지도. */}
+              {(() => {
+                const hasCoords = conf.lat != null && conf.lng != null;
+                const lat = hasCoords ? Number(conf.lat) : null;
+                const lng = hasCoords ? Number(conf.lng) : null;
+                const span = 0.012; // ~1.5km radius
+                const bbox = hasCoords
+                  ? `${lng! - span},${lat! - span},${lng! + span},${lat! + span}`
+                  : "126.85,37.45,127.18,37.62"; // 서울 광역 fallback
+                const osmSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik${
+                  hasCoords ? `&marker=${lat},${lng}` : ""
+                }`;
+                const naverQuery = encodeURIComponent(
                   `${conf.venue} ${conf.city ?? ""}`.trim(),
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "block",
-                  height: 120,
-                  background:
-                    "linear-gradient(135deg, var(--bm-bg-muted) 0%, var(--bm-primary-subtle) 100%)",
-                  position: "relative",
-                  textDecoration: "none",
-                }}
-                aria-label="지도에서 보기"
-              >
+                );
+                const naverUrl = `https://map.naver.com/v5/search/${naverQuery}`;
+                return (
+                  <div style={{ position: "relative" }}>
+                    <iframe
+                      src={osmSrc}
+                      title="지도"
+                      width="100%"
+                      height="220"
+                      style={{
+                        display: "block",
+                        border: 0,
+                        background: "var(--bm-bg-muted)",
+                      }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                    <a
+                      href={naverUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        position: "absolute",
+                        bottom: 10,
+                        right: 10,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "6px 12px",
+                        background: "#03C75A",
+                        color: "#fff",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        borderRadius: 6,
+                        textDecoration: "none",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
+                      }}
+                      aria-label="네이버 지도에서 보기"
+                    >
+                      네이버 지도 →
+                    </a>
+                  </div>
+                );
+              })()}
+              <div style={{ padding: 16 }}>
                 <div
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <svg
-                    width="36"
-                    height="36"
-                    viewBox="0 0 36 36"
-                    fill="none"
-                    stroke="var(--bm-primary)"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M18 4c-5.5 0-10 4-10 9 0 7 10 19 10 19s10-12 10-19c0-5-4.5-9-10-9z" />
-                    <circle cx="18" cy="13" r="3" />
-                  </svg>
-                </div>
-                <span
-                  style={{
-                    position: "absolute",
-                    bottom: 8,
-                    right: 10,
-                    fontSize: 10,
-                    color: "var(--bm-primary)",
+                    fontSize: 12,
                     fontWeight: 600,
-                    background: "rgba(255,255,255,0.9)",
-                    padding: "3px 8px",
-                    borderRadius: 999,
-                  }}
-                >
-                  지도 보기 →
-                </span>
-              </a>
-              <div style={{ padding: 14 }}>
-                <div
-                  style={{
-                    fontSize: 11,
                     color: "var(--bm-text-tertiary)",
-                    marginBottom: 4,
+                    marginBottom: 6,
                   }}
                 >
                   개최 장소
                 </div>
                 <div
                   style={{
-                    fontSize: 13,
-                    fontWeight: 600,
+                    fontSize: 15,
+                    fontWeight: 700,
                     color: "var(--bm-text-primary)",
                     lineHeight: 1.4,
                     wordBreak: "keep-all",
@@ -537,9 +542,9 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 {conf.city && (
                   <div
                     style={{
-                      fontSize: 12,
+                      fontSize: 14,
                       color: "var(--bm-text-secondary)",
-                      marginTop: 2,
+                      marginTop: 4,
                     }}
                   >
                     {conf.city}
@@ -562,14 +567,14 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               padding: 20,
             }}
           >
-            <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>일정 정보</h3>
+            <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 700 }}>일정 정보</h3>
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "110px 1fr",
-                rowGap: 12,
+                rowGap: 14,
                 columnGap: 16,
-                fontSize: 13,
+                fontSize: 15,
               }}
             >
               <div style={{ color: "var(--bm-text-tertiary)" }}>개최일</div>
@@ -579,11 +584,11 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               </div>
               {conf.venue && (
                 <>
-                  <div style={{ color: "var(--bm-text-tertiary)" }}>장소</div>
-                  <div style={{ color: "var(--bm-text-primary)" }}>
+                  <div style={{ color: "var(--bm-text-tertiary)", fontWeight: 500 }}>장소</div>
+                  <div style={{ color: "var(--bm-text-primary)", fontWeight: 600 }}>
                     {conf.venue}
                     {conf.city && (
-                      <div style={{ fontSize: 12, color: "var(--bm-text-secondary)", marginTop: 2 }}>
+                      <div style={{ fontSize: 14, fontWeight: 400, color: "var(--bm-text-secondary)", marginTop: 4 }}>
                         {conf.city}
                       </div>
                     )}
@@ -600,16 +605,16 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 background: "var(--bm-surface)",
                 border: "1px solid var(--bm-border)",
                 borderRadius: 8,
-                padding: 20,
+                padding: 22,
               }}
             >
-              <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700 }}>행사 개요</h3>
+              <h3 style={{ margin: "0 0 14px", fontSize: 18, fontWeight: 700 }}>행사 개요</h3>
               <p
                 style={{
                   margin: 0,
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                  color: "var(--bm-text-secondary)",
+                  fontSize: 16,
+                  lineHeight: 1.75,
+                  color: "var(--bm-text-primary)",
                   whiteSpace: "pre-wrap",
                 }}
               >

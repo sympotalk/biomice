@@ -50,6 +50,7 @@ export function Header({ userEmail }: Props) {
           {/* Logo (always visible) */}
           <Link
             href="/"
+            className="bm-header-logo"
             style={{
               textDecoration: "none",
               flexShrink: 0,
@@ -61,15 +62,14 @@ export function Header({ userEmail }: Props) {
             <img
               src="/logo.png"
               alt="바이오마이스 BioMICE"
-              style={{ display: "block", height: 26, width: "auto" }}
+              style={{ display: "block", width: "auto" }}
             />
           </Link>
 
           {/* Desktop nav */}
           <nav
-            className="bm-show-desktop-flex"
+            className="bm-show-desktop-flex bm-header-nav"
             style={{
-              gap: 20,
               flex: 1,
               alignItems: "center",
             }}
@@ -407,9 +407,10 @@ function DrawerLink({
 }
 
 const navLinkStyle: React.CSSProperties = {
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 500,
   color: "var(--bm-text-primary)",
   textDecoration: "none",
-  padding: "6px 0",
+  padding: "8px 0",
+  letterSpacing: -0.2,
 };

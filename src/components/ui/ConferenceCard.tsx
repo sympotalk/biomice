@@ -271,34 +271,43 @@ export function ConferenceCard({
           {title}
         </h3>
 
-        {/* 날짜 — 큼직하게 */}
+        {/* 날짜 — 진하게 */}
         <div
           className="mono-num"
           style={{
             display: "flex",
             alignItems: "center",
             gap: 6,
-            fontSize: 14,
-            fontWeight: 500,
+            fontSize: 15,
+            fontWeight: 600,
             color: "var(--bm-text-primary)",
           }}
         >
-          <CalendarIcon style={{ flexShrink: 0, color: "var(--bm-text-tertiary)" }} />
+          <CalendarIcon
+            width={15}
+            height={15}
+            style={{ flexShrink: 0, color: "var(--bm-text-secondary)" }}
+          />
           <span>{dateLine}</span>
         </div>
 
-        {/* 위치 — 국기 + 도시/장소 */}
+        {/* 위치 — 진하게 */}
         {venueLine && (
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
-              fontSize: 13,
-              color: "var(--bm-text-secondary)",
+              fontSize: 14,
+              fontWeight: 500,
+              color: "var(--bm-text-primary)",
             }}
           >
-            <PinIcon style={{ flexShrink: 0, color: "var(--bm-text-tertiary)" }} />
+            <PinIcon
+              width={15}
+              height={15}
+              style={{ flexShrink: 0, color: "var(--bm-text-secondary)" }}
+            />
             <span
               style={{
                 overflow: "hidden",
@@ -313,14 +322,15 @@ export function ConferenceCard({
           </div>
         )}
 
-        {/* 학회명 (하단 라벨) */}
+        {/* 학회명 (하단 라벨) — 진하게 */}
         <div
           style={{
             marginTop: "auto",
             paddingTop: 12,
             borderTop: "1px solid var(--bm-border)",
-            fontSize: 12,
-            color: "var(--bm-text-tertiary)",
+            fontSize: 13,
+            fontWeight: 500,
+            color: "var(--bm-text-secondary)",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",

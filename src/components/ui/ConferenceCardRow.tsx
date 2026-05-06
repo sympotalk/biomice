@@ -357,7 +357,7 @@ export function ConferenceCardRow({
           {title}
         </div>
 
-        {/* 3줄: 날짜 — 큼직하게 */}
+        {/* 3줄: 날짜 — 진하게 */}
         <div
           className="mono-num"
           style={{
@@ -365,35 +365,36 @@ export function ConferenceCardRow({
             alignItems: "center",
             gap: 6,
             fontSize: 14,
-            fontWeight: 500,
+            fontWeight: 600,
             color: "var(--bm-text-primary)",
             marginTop: 6,
           }}
         >
           <CalendarIcon
-            width={13}
-            height={13}
-            style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }}
+            width={14}
+            height={14}
+            style={{ color: "var(--bm-text-secondary)", flexShrink: 0 }}
           />
           {dateLine}
         </div>
 
-        {/* 4줄: 장소 — 큼직하게 */}
+        {/* 4줄: 장소 — 진하게 */}
         {venueLine && (
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
-              fontSize: 13,
-              color: "var(--bm-text-secondary)",
-              marginTop: 3,
+              fontSize: 14,
+              fontWeight: 500,
+              color: "var(--bm-text-primary)",
+              marginTop: 4,
             }}
           >
             <PinIcon
-              width={13}
-              height={13}
-              style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }}
+              width={14}
+              height={14}
+              style={{ color: "var(--bm-text-secondary)", flexShrink: 0 }}
             />
             <span
               style={{
