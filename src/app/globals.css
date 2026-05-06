@@ -319,6 +319,30 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
+/* 상세 페이지 외곽 layout — 본문 grid + 별도 우측 광고 column.
+   광고가 외부링크 카드 아래가 아닌 페이지 최우측에 sticky로 표시되도록 분리. */
+.bm-detail-page-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+.bm-detail-page-layout > .bm-detail-grid {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+@media (max-width: 1100px) {
+  .bm-detail-page-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
 /* 학술대회 상세 3단 (데스크톱) — 좌(메타/지도) · 중(콘텐츠) · 우(sticky CTA) */
 .bm-detail-grid {
   display: grid;

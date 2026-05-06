@@ -5,7 +5,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/Button";
 import {
   DDayBadge,
-  FeaturedBadge,
   RegistrationOpenBadge,
 } from "@/components/ui/Badge";
 import { ExternalIcon } from "@/components/ui/Icon";
@@ -16,6 +15,7 @@ import {
 } from "@/lib/queries";
 import { FavoriteHeart } from "@/components/ui/FavoriteHeart";
 import { StickyDetailCTA } from "@/components/conferences/StickyDetailCTA";
+import { VenueMap } from "@/components/conferences/VenueMap";
 import { AdSidebarStack } from "@/components/ui/AdSidebarStack";
 import {
   computeDDay,
@@ -118,7 +118,25 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             <div style={{ flex: 1, minWidth: 0 }}>
               {/* Badges */}
               <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-                {conf.is_featured && <FeaturedBadge variant="featured" />}
+                {conf.is_featured && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      height: 26,
+                      padding: "0 12px",
+                      background: "var(--bm-accent-subtle)",
+                      color: "var(--bm-accent)",
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    ✦ 주요 행사
+                  </span>
+                )}
                 {regOpen && <RegistrationOpenBadge />}
                 <DDayBadge days={dd} />
                 {conf.is_kams_certified && (
@@ -251,7 +269,10 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
         </div>
       </section>
 
-      {/* ── 3-column body (데스크톱) ────────────────────────────────────── */}
+      {/* ── 페이지 layout: 본문 grid + 별도 우측 광고 column ─────────────── */}
+      <div className="bm-detail-page-layout">
+
+      {/* ── 3-column body (좌메타 / 중앙 / 우 sticky CTA) ──────────────── */}
       <div className="bm-detail-grid">
         {/* ── 좌측 메타 (학회 정보 + 지도 + 태그) ───────────────────────── */}
         <aside
@@ -457,65 +478,14 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 overflow: "hidden",
               }}
             >
-              {/* 지도 — OpenStreetMap iframe (API 키 불필요) + 네이버 지도 외부 링크.
-                   conf.lat/lng가 있으면 정확한 marker, 없으면 도시 광역 지도. */}
-              {(() => {
-                const hasCoords = conf.lat != null && conf.lng != null;
-                const lat = hasCoords ? Number(conf.lat) : null;
-                const lng = hasCoords ? Number(conf.lng) : null;
-                const span = 0.012; // ~1.5km radius
-                const bbox = hasCoords
-                  ? `${lng! - span},${lat! - span},${lng! + span},${lat! + span}`
-                  : "126.85,37.45,127.18,37.62"; // 서울 광역 fallback
-                const osmSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik${
-                  hasCoords ? `&marker=${lat},${lng}` : ""
-                }`;
-                const naverQuery = encodeURIComponent(
-                  `${conf.venue} ${conf.city ?? ""}`.trim(),
-                );
-                const naverUrl = `https://map.naver.com/v5/search/${naverQuery}`;
-                return (
-                  <div style={{ position: "relative" }}>
-                    <iframe
-                      src={osmSrc}
-                      title="지도"
-                      width="100%"
-                      height="220"
-                      style={{
-                        display: "block",
-                        border: 0,
-                        background: "var(--bm-bg-muted)",
-                      }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
-                    <a
-                      href={naverUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        position: "absolute",
-                        bottom: 10,
-                        right: 10,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4,
-                        padding: "6px 12px",
-                        background: "#03C75A",
-                        color: "#fff",
-                        fontSize: 12,
-                        fontWeight: 700,
-                        borderRadius: 6,
-                        textDecoration: "none",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
-                      }}
-                      aria-label="네이버 지도에서 보기"
-                    >
-                      네이버 지도 →
-                    </a>
-                  </div>
-                );
-              })()}
+              {/* 지도 — 페이지 내 임베드 (OSM/네이버 토글) */}
+              <VenueMap
+                venue={conf.venue}
+                city={conf.city}
+                lat={conf.lat}
+                lng={conf.lng}
+                height={240}
+              />
               <div style={{ padding: 16 }}>
                 <div
                   style={{
@@ -808,9 +778,17 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             </div>
           )}
 
-          {/* 우측 광고 — right_sidebar slot, banner.display_width/height 동적 */}
-          <AdSidebarStack banners={sidebarBanners} />
         </aside>
+      </div>
+
+      {/* ── 별도 우측 광고 column (메인 페이지처럼 본문과 분리) ─────────── */}
+      <AdSidebarStack banners={sidebarBanners} />
+
+      </div>{/* /bm-detail-page-layout */}
+
+      {/* 모바일 인라인 광고 (데스크톱은 우측 별도 column) */}
+      <div className="bm-show-mobile" style={{ padding: "0 14px", maxWidth: 1280, margin: "0 auto" }}>
+        <AdSidebarStack banners={sidebarBanners} mobile />
       </div>
 
       <Footer />
