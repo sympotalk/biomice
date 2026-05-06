@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { CalendarIcon, PinIcon } from "./Icon";
-import { DDayBadge, FeaturedBadge, RegistrationOpenBadge } from "./Badge";
 import { FavoriteHeart } from "./FavoriteHeart";
 import { radius } from "@/lib/tokens";
 
@@ -28,6 +27,27 @@ export type ConferenceCardProps = {
   href?: string;
 };
 
+const COUNTRY_FLAG: Record<string, string> = {
+  KR: "🇰🇷",
+  US: "🇺🇸",
+  ES: "🇪🇸",
+  IT: "🇮🇹",
+  GB: "🇬🇧",
+  DE: "🇩🇪",
+  FR: "🇫🇷",
+  JP: "🇯🇵",
+  CN: "🇨🇳",
+  CH: "🇨🇭",
+  AT: "🇦🇹",
+};
+
+/**
+ * 학술대회 카드 — myfair.co 스타일.
+ *   - 배경 흰색
+ *   - 상단 알약 모양 상태 뱃지 (참가 가능 / 마감 임박 / 잔여 부스 확인 필요)
+ *   - 중앙 큰 학회 로고 (84px 약자 박스)
+ *   - 제목/날짜/위치 텍스트 큼직하게
+ */
 export function ConferenceCard({
   id,
   title,
@@ -49,6 +69,52 @@ export function ConferenceCard({
   const [hov, setHov] = useState(false);
   const destination = href ?? `/conferences/${id}`;
 
+  // 상단 알약 뱃지: 마감 임박 (D-7 이내) > Featured > 참가 가능 > 일반
+  type Pill = { label: string; bg: string; color: string; icon?: string };
+  let pill: Pill;
+  if (dDay != null && dDay >= 0 && dDay <= 7) {
+    pill = {
+      label: "마감 임박",
+      bg: "var(--bm-danger-subtle)",
+      color: "var(--bm-danger)",
+      icon: "🔥",
+    };
+  } else if (featured) {
+    pill = {
+      label: "주요 행사",
+      bg: "var(--bm-accent-subtle)",
+      color: "var(--bm-accent)",
+      icon: "✦",
+    };
+  } else if (registrationOpen) {
+    pill = {
+      label: "참가 가능",
+      bg: "var(--bm-success-subtle)",
+      color: "var(--bm-success)",
+      icon: "✓",
+    };
+  } else {
+    pill = {
+      label: "사전 안내",
+      bg: "var(--bm-bg-muted)",
+      color: "var(--bm-text-secondary)",
+    };
+  }
+
+  // 로고 폰트 크기 자동
+  const initials = logoText || society.slice(0, 2);
+  const isEnglish = /^[A-Z0-9-]+$/.test(initials);
+  const logoFs = isEnglish
+    ? initials.length >= 5
+      ? 18
+      : initials.length === 4
+      ? 22
+      : 28
+    : 28;
+
+  const dateLine = endDate ? `${startDate} – ${endDate}` : startDate;
+  const venueLine = [venue, city].filter(Boolean).join(" · ");
+
   return (
     <Link
       href={destination}
@@ -56,28 +122,27 @@ export function ConferenceCard({
       onMouseLeave={() => setHov(false)}
       style={{
         position: "relative",
-        display: "block",
+        display: "flex",
+        flexDirection: "column",
         background: "var(--bm-surface)",
-        border: `1px solid ${featured ? "var(--bm-accent-border)" : "var(--bm-border)"}`,
-        borderRadius: radius.card,
+        border: "1px solid var(--bm-border)",
+        borderRadius: 14,
         overflow: "hidden",
         cursor: "pointer",
         transition: "all .18s",
         boxShadow: hov
-          ? "0 4px 16px rgba(0,0,0,0.06)"
-          : "0 1px 2px rgba(0,0,0,0.02)",
-        transform: hov ? "translateY(-2px)" : "translateY(0)",
+          ? "0 8px 24px rgba(26,40,60,0.08)"
+          : "0 2px 4px rgba(26,40,60,0.04)",
+        transform: hov ? "translateY(-3px)" : "translateY(0)",
         textDecoration: "none",
         color: "inherit",
       }}
     >
-      {/* Logo/Image area */}
+      {/* Top section — 큰 로고 + 알약 뱃지 + 즐겨찾기 */}
       <div
         style={{
-          height: compact ? 120 : 160,
-          background: featured
-            ? "linear-gradient(135deg, var(--bm-accent-subtle) 0%, var(--bm-bg-muted) 100%)"
-            : "var(--bm-bg-muted)",
+          height: compact ? 140 : 180,
+          background: "var(--bm-bg)",
           borderBottom: "1px solid var(--bm-border)",
           position: "relative",
           display: "flex",
@@ -85,140 +150,180 @@ export function ConferenceCard({
           justifyContent: "center",
         }}
       >
-        <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 6 }}>
-          {featured && <FeaturedBadge variant="featured" />}
-          {!featured && registrationOpen && <RegistrationOpenBadge />}
+        {/* 좌상단 알약 상태 뱃지 */}
+        <span
+          style={{
+            position: "absolute",
+            top: 14,
+            left: 14,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            height: 26,
+            padding: "0 12px",
+            background: pill.bg,
+            color: pill.color,
+            borderRadius: 999,
+            fontSize: 12,
+            fontWeight: 700,
+            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+          }}
+        >
+          {pill.icon && <span>{pill.icon}</span>}
+          {pill.label}
+        </span>
+
+        {/* 우상단 즐겨찾기 */}
+        <div style={{ position: "absolute", top: 10, right: 10 }}>
+          <FavoriteHeart active={favorite} conferenceId={id} size={36} />
         </div>
-        <div style={{ position: "absolute", top: 8, right: 8 }}>
-          <FavoriteHeart active={favorite} conferenceId={id} size={32} />
+
+        {/* 중앙 큰 로고 박스 */}
+        <div
+          style={{
+            width: compact ? 76 : 92,
+            height: compact ? 76 : 92,
+            borderRadius: 16,
+            background: logoColor || "var(--bm-primary)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "var(--font-mono)",
+            fontWeight: 800,
+            fontSize: logoFs,
+            letterSpacing: 0.5,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          {initials}
         </div>
-        {/* 학회 로고 — 영문 약자 박스 (이미지 사용 안 함) */}
-        {(() => {
-          const initials = logoText || society.slice(0, 2);
-          const isEnglish = /^[A-Z0-9-]+$/.test(initials);
-          const fs = isEnglish
-            ? initials.length >= 5
-              ? 12
-              : initials.length === 4
-              ? 14
-              : 18
-            : 18;
-          return (
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 10,
-                background: logoColor || "var(--bm-primary)",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "var(--font-mono)",
-                fontWeight: 800,
-                fontSize: fs,
-                letterSpacing: 0.3,
-              }}
-            >
-              {initials}
-            </div>
-          );
-        })()}
       </div>
 
       {/* Body */}
-      <div style={{ padding: 16 }}>
+      <div
+        style={{
+          padding: 18,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          flex: 1,
+        }}
+      >
+        {/* 진료과 + D-day 작은 칩 */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 6,
-            marginBottom: 8,
             flexWrap: "wrap",
           }}
         >
           {specialty && (
             <span
               style={{
-                fontSize: 11,
-                fontWeight: 500,
+                fontSize: 12,
+                fontWeight: 600,
                 color: "var(--bm-primary)",
                 background: "var(--bm-primary-subtle)",
-                padding: "2px 8px",
-                borderRadius: 3,
+                padding: "3px 10px",
+                borderRadius: 4,
               }}
             >
               {specialty}
             </span>
           )}
-          {dDay != null && <DDayBadge days={dDay} size="sm" />}
+          {dDay != null && (
+            <span
+              className="mono-num"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "3px 8px",
+                borderRadius: 4,
+                background: "var(--bm-bg-muted)",
+                color: "var(--bm-text-secondary)",
+              }}
+            >
+              {dDay === 0 ? "D-DAY" : dDay > 0 ? `D-${dDay}` : `D+${Math.abs(dDay)}`}
+            </span>
+          )}
         </div>
 
+        {/* 제목 — 큼직하게 */}
         <h3
           style={{
             margin: 0,
-            fontSize: 15,
-            fontWeight: 600,
+            fontSize: 16,
+            fontWeight: 700,
             lineHeight: 1.4,
             color: "var(--bm-text-primary)",
+            letterSpacing: -0.2,
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            minHeight: 42,
+            wordBreak: "keep-all",
+            overflowWrap: "anywhere",
+            minHeight: 46,
           }}
         >
           {title}
         </h3>
 
-        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+        {/* 날짜 — 큼직하게 */}
+        <div
+          className="mono-num"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 14,
+            fontWeight: 500,
+            color: "var(--bm-text-primary)",
+          }}
+        >
+          <CalendarIcon style={{ flexShrink: 0, color: "var(--bm-text-tertiary)" }} />
+          <span>{dateLine}</span>
+        </div>
+
+        {/* 위치 — 국기 + 도시/장소 */}
+        {venueLine && (
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--bm-text-secondary)",
             }}
           >
-            <CalendarIcon style={{ flexShrink: 0 }} />
-            <span className="mono-num">
-              {startDate}
-              {endDate ? ` – ${endDate}` : ""}
-            </span>
-          </div>
-          {venue && (
-            <div
+            <PinIcon style={{ flexShrink: 0, color: "var(--bm-text-tertiary)" }} />
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: 12,
-                color: "var(--bm-text-secondary)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                flex: 1,
+                minWidth: 0,
               }}
             >
-              <PinIcon style={{ flexShrink: 0 }} />
-              <span
-                style={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {venue}
-                {city ? ` · ${city}` : ""}
-              </span>
-            </div>
-          )}
-        </div>
+              {venueLine}
+            </span>
+          </div>
+        )}
 
+        {/* 학회명 (하단 라벨) */}
         <div
           style={{
-            marginTop: 12,
+            marginTop: "auto",
             paddingTop: 12,
             borderTop: "1px solid var(--bm-border)",
             fontSize: 12,
             color: "var(--bm-text-tertiary)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
           {society}
@@ -227,3 +332,6 @@ export function ConferenceCard({
     </Link>
   );
 }
+
+// flag exported for use elsewhere if needed
+export const ConferenceCardCountryFlag = COUNTRY_FLAG;

@@ -10,7 +10,12 @@ import {
   RegistrationOpenBadge,
 } from "@/components/ui/Badge";
 import { ExternalIcon } from "@/components/ui/Icon";
-import { getConference, getBannerForSlot, getMyBookmarkIds } from "@/lib/queries";
+import {
+  getConference,
+  getBannerForSlot,
+  getMyBookmarkIds,
+  listSidebarBanners,
+} from "@/lib/queries";
 import { FavoriteHeart } from "@/components/ui/FavoriteHeart";
 import { StickyDetailCTA } from "@/components/conferences/StickyDetailCTA";
 import {
@@ -46,9 +51,10 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
   const numId = Number(id);
   if (!Number.isFinite(numId)) notFound();
 
-  const [conf, sideBanner, bookmarkedIds] = await Promise.all([
+  const [conf, sideBanner, sidebarBanners, bookmarkedIds] = await Promise.all([
     getConference(numId),
     getBannerForSlot("detail_bottom"),
+    listSidebarBanners(2),
     getMyBookmarkIds(),
   ]);
   if (!conf) notFound();
@@ -799,15 +805,103 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             </div>
           )}
 
-          {/* Side banner */}
-          {sideBanner && (
-            <AdBanner
-              size="square"
-              sponsor={sideBanner.advertiser_name ?? undefined}
-              title={sideBanner.title ?? "Advertisement"}
-              cta="자세히 보기"
-              href={sideBanner.link_url}
-            />
+          {/* 우측 광고 — monews 스타일 stack (right_sidebar 슬롯) */}
+          {sidebarBanners.length > 0 ? (
+            <div style={{ marginTop: 4 }}>
+              {sidebarBanners.map((b) => (
+                <a
+                  key={b.id}
+                  href={b.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  style={{
+                    display: "block",
+                    textDecoration: "none",
+                    color: "inherit",
+                    marginBottom: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      background: "var(--bm-surface)",
+                      border: "1px solid var(--bm-border)",
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        left: 8,
+                        zIndex: 2,
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: "var(--bm-text-tertiary)",
+                        background: "rgba(255,255,255,0.85)",
+                        padding: "2px 6px",
+                        borderRadius: 3,
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      AD
+                    </span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={b.image_url}
+                      alt={b.title ?? b.advertiser_name ?? "광고"}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: 320,
+                        objectFit: "cover",
+                        background: "var(--bm-bg-muted)",
+                      }}
+                    />
+                    <div style={{ padding: 12 }}>
+                      {b.advertiser_name && (
+                        <div
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: "var(--bm-text-tertiary)",
+                            marginBottom: 4,
+                          }}
+                        >
+                          {b.advertiser_name}
+                        </div>
+                      )}
+                      {b.title && (
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 600,
+                            color: "var(--bm-text-primary)",
+                            lineHeight: 1.4,
+                            wordBreak: "keep-all",
+                          }}
+                        >
+                          {b.title}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            sideBanner && (
+              <AdBanner
+                size="square"
+                sponsor={sideBanner.advertiser_name ?? undefined}
+                title={sideBanner.title ?? "Advertisement"}
+                cta="자세히 보기"
+                href={sideBanner.link_url}
+              />
+            )
           )}
         </aside>
       </div>

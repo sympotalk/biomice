@@ -140,6 +140,20 @@ export async function listConferences(params: {
   return { rows: data ?? [], total: count ?? 0 };
 }
 
+/** 우측 사이드바 광고 배너 stack — priority 내림차순 */
+export async function listSidebarBanners(limit = 3): Promise<Banner[]> {
+  const sb = await createServerClient();
+  const { data, error } = await sb
+    .from("banners")
+    .select("*")
+    .eq("slot_name", "right_sidebar")
+    .eq("is_active", true)
+    .order("priority", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
+
 /** 국제 학술대회만 — 데이터 부족 시 home에서 사용 */
 export async function listInternationalConferences(limit = 12): Promise<Conference[]> {
   const sb = await createServerClient();

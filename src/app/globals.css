@@ -234,6 +234,21 @@ body {
   padding: 0 20px;
 }
 
+/* 홈 페이지 — 좌측 콘텐츠 + 우측 sticky 광고 사이드바 (데스크톱) */
+.bm-home-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .bm-home-layout {
+    gap: 0;
+  }
+}
+
 .bm-hero {
   padding: 72px 20px 56px;
 }

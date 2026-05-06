@@ -126,11 +126,11 @@ export function ConferenceCardRow({
   const isEnglish = /^[A-Z0-9-]+$/.test(initials);
   const initialFontSize = isEnglish
     ? initials.length >= 5
-      ? 9
-      : initials.length === 4
       ? 11
-      : 13
-    : 13;
+      : initials.length === 4
+      ? 13
+      : 15
+    : 15;
 
   return (
     <Link
@@ -141,11 +141,11 @@ export function ConferenceCardRow({
         width: "100%",
         maxWidth: "100%",
         minWidth: 0,
-        gap: 12,
-        padding: 12,
-        background: featured ? "var(--bm-accent-subtle)" : "var(--bm-surface)",
+        gap: 14,
+        padding: 14,
+        background: "var(--bm-surface)",
         border: `1px solid ${featured ? "var(--bm-accent-border)" : "var(--bm-border)"}`,
-        borderRadius: 8,
+        borderRadius: 10,
         textDecoration: "none",
         color: "inherit",
         cursor: "pointer",
@@ -164,19 +164,19 @@ export function ConferenceCardRow({
             bottom: 0,
             width: 3,
             background: "var(--bm-accent)",
-            borderTopLeftRadius: 8,
-            borderBottomLeftRadius: 8,
+            borderTopLeftRadius: 10,
+            borderBottomLeftRadius: 10,
           }}
         />
       )}
 
-      {/* 좌측 로고 48px */}
+      {/* 좌측 로고 56px (커짐) */}
       <div
         style={{
-          width: 48,
-          height: 48,
+          width: 56,
+          height: 56,
           flexShrink: 0,
-          borderRadius: 8,
+          borderRadius: 10,
           background: logoColor || "var(--bm-primary)",
           color: "#fff",
           display: "flex",
@@ -338,17 +338,17 @@ export function ConferenceCardRow({
           </div>
         </div>
 
-        {/* 2줄: 제목 (1줄 ellipsis) */}
+        {/* 2줄: 제목 (1줄 ellipsis) — 큼직하게 */}
         <div
           style={{
             display: "block",
             width: "100%",
             maxWidth: "100%",
-            fontSize: 14,
-            fontWeight: 600,
+            fontSize: 16,
+            fontWeight: 700,
             color: "var(--bm-text-primary)",
             lineHeight: 1.35,
-            letterSpacing: -0.1,
+            letterSpacing: -0.2,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -357,41 +357,42 @@ export function ConferenceCardRow({
           {title}
         </div>
 
-        {/* 3줄: 날짜 */}
+        {/* 3줄: 날짜 — 큼직하게 */}
         <div
           className="mono-num"
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 4,
-            fontSize: 12,
-            color: "var(--bm-text-secondary)",
-            marginTop: 4,
+            gap: 6,
+            fontSize: 14,
+            fontWeight: 500,
+            color: "var(--bm-text-primary)",
+            marginTop: 6,
           }}
         >
           <CalendarIcon
-            width={11}
-            height={11}
+            width={13}
+            height={13}
             style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }}
           />
           {dateLine}
         </div>
 
-        {/* 4줄: 장소 */}
+        {/* 4줄: 장소 — 큼직하게 */}
         {venueLine && (
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 4,
-              fontSize: 12,
+              gap: 6,
+              fontSize: 13,
               color: "var(--bm-text-secondary)",
-              marginTop: 2,
+              marginTop: 3,
             }}
           >
             <PinIcon
-              width={11}
-              height={11}
+              width={13}
+              height={13}
               style={{ color: "var(--bm-text-tertiary)", flexShrink: 0 }}
             />
             <span

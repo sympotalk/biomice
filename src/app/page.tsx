@@ -4,6 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { ConferenceGrid } from "@/components/home/ConferenceGrid";
 import { AdBanner } from "@/components/ui/AdBanner";
+import { AdSidebarStack } from "@/components/ui/AdSidebarStack";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
   listFeaturedConferences,
@@ -12,21 +13,30 @@ import {
   getSpecialtyCounts,
   getBannerForSlot,
   getMyBookmarkIds,
+  listSidebarBanners,
 } from "@/lib/queries";
 
 // Per-user bookmark state means we can't statically cache this page.
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, thisWeek, upcoming, specialtyCounts, banner, bookmarkedIds] =
-    await Promise.all([
-      listFeaturedConferences(6),
-      listThisWeekConferences(8),
-      listUpcomingConferences(12),
-      getSpecialtyCounts(),
-      getBannerForSlot("main_top"),
-      getMyBookmarkIds(),
-    ]);
+  const [
+    featured,
+    thisWeek,
+    upcoming,
+    specialtyCounts,
+    banner,
+    sidebarBanners,
+    bookmarkedIds,
+  ] = await Promise.all([
+    listFeaturedConferences(6),
+    listThisWeekConferences(8),
+    listUpcomingConferences(12),
+    getSpecialtyCounts(),
+    getBannerForSlot("main_top"),
+    listSidebarBanners(3),
+    getMyBookmarkIds(),
+  ]);
 
   const topSpecialties = specialtyCounts.slice(0, 8).map((s) => s.category);
 
@@ -36,65 +46,76 @@ export default async function HomePage() {
       <Hero totalUpcoming={upcoming.length} topSpecialties={topSpecialties} />
 
       <main className="bm-main">
-        {/* Main top banner */}
-        {banner && (
-          <div style={{ padding: "24px 0" }}>
-            <AdBanner
-              size="wide"
-              sponsor={banner.advertiser_name ?? undefined}
-              title={banner.title ?? "Advertisement"}
-              cta="자세히 보기"
-              href={banner.link_url}
-            />
+        <div className="bm-home-layout">
+          {/* ── 좌측 콘텐츠 ─────────────────────────────────────────── */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Main top banner */}
+            {banner && (
+              <div style={{ padding: "24px 0" }}>
+                <AdBanner
+                  size="wide"
+                  sponsor={banner.advertiser_name ?? undefined}
+                  title={banner.title ?? "Advertisement"}
+                  cta="자세히 보기"
+                  href={banner.link_url}
+                />
+              </div>
+            )}
+
+            {/* Featured */}
+            {featured.length > 0 && (
+              <section className="bm-section">
+                <SectionHeader
+                  title="Featured 학술대회"
+                  caption="이달의 주요 일정"
+                  actionHref="/conferences?view=featured"
+                />
+                <ConferenceGrid
+                  conferences={featured}
+                  scroll
+                  bookmarkedIds={bookmarkedIds}
+                />
+              </section>
+            )}
+
+            {/* 모바일 인라인 광고 (데스크톱은 우측 사이드바) */}
+            <AdSidebarStack banners={sidebarBanners} mobile />
+
+            {/* This week */}
+            <section className="bm-section">
+              <SectionHeader
+                title="이번 주 열리는"
+                caption={`D-7 이내 · ${thisWeek.length}건`}
+                actionHref="/conferences?view=upcoming"
+              />
+              {thisWeek.length > 0 ? (
+                <ConferenceGrid conferences={thisWeek} scroll bookmarkedIds={bookmarkedIds} />
+              ) : (
+                <EmptyState
+                  title="이번 주 예정된 학술대회가 없습니다"
+                  description="전체 학술대회 목록에서 다가오는 일정을 확인해 보세요."
+                />
+              )}
+            </section>
+
+            {/* Upcoming */}
+            <section className="bm-section-last">
+              <SectionHeader
+                title="다가오는 학술대회"
+                caption={`가까운 일정순 · ${upcoming.length}건`}
+                actionHref="/conferences"
+              />
+              {upcoming.length > 0 ? (
+                <ConferenceGrid conferences={upcoming} bookmarkedIds={bookmarkedIds} />
+              ) : (
+                <EmptyState />
+              )}
+            </section>
           </div>
-        )}
 
-        {/* Featured */}
-        {featured.length > 0 && (
-          <section className="bm-section">
-            <SectionHeader
-              title="Featured 학술대회"
-              caption="이달의 주요 일정"
-              actionHref="/conferences?view=featured"
-            />
-            <ConferenceGrid
-              conferences={featured}
-              scroll
-              bookmarkedIds={bookmarkedIds}
-            />
-          </section>
-        )}
-
-        {/* This week */}
-        <section className="bm-section">
-          <SectionHeader
-            title="이번 주 열리는"
-            caption={`D-7 이내 · ${thisWeek.length}건`}
-            actionHref="/conferences?view=upcoming"
-          />
-          {thisWeek.length > 0 ? (
-            <ConferenceGrid conferences={thisWeek} scroll bookmarkedIds={bookmarkedIds} />
-          ) : (
-            <EmptyState
-              title="이번 주 예정된 학술대회가 없습니다"
-              description="전체 학술대회 목록에서 다가오는 일정을 확인해 보세요."
-            />
-          )}
-        </section>
-
-        {/* Upcoming */}
-        <section className="bm-section-last">
-          <SectionHeader
-            title="다가오는 학술대회"
-            caption={`가까운 일정순 · ${upcoming.length}건`}
-            actionHref="/conferences"
-          />
-          {upcoming.length > 0 ? (
-            <ConferenceGrid conferences={upcoming} bookmarkedIds={bookmarkedIds} />
-          ) : (
-            <EmptyState />
-          )}
-        </section>
+          {/* ── 우측 sticky 광고 사이드바 (데스크톱 only) ───────────── */}
+          <AdSidebarStack banners={sidebarBanners} />
+        </div>
       </main>
 
       <Footer />
