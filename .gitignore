@@ -34,9 +34,17 @@ yarn-error.log*
 .env*
 !.env.local.example
 
-# claude code (local permissions)
+# claude code
 .claude/settings.local.json
 .claude/worktrees/
+.claude/session.log
+.claude/.cache/
+
+# claude code 자동화 — 배포 기록 중 시크릿 포함 가능 파일은 제외
+docs/deployments/*-secrets.md
+
+# CLAUDE.md / 기타 백업 파일
+*.backup
 
 # vercel
 .vercel
