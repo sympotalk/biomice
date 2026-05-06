@@ -25,9 +25,27 @@ export async function loginAction(
   }
 
   const sb = await createClient();
-  const { error } = await sb.auth.signInWithPassword({ email, password });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) {
     return { error: translateAuthError(error.message) };
+  }
+
+  // 이메일 확인 후 최초 로그인인 경우 profile row가 없을 수 있으므로 보장
+  if (data.user) {
+    const { data: existing } = await sb
+      .from("users_profile")
+      .select("id")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (!existing) {
+      const userType = (data.user.user_metadata?.user_type as string) ?? "other";
+      await sb.from("users_profile").insert({
+        id: data.user.id,
+        user_type: userType,
+        organization: (data.user.user_metadata?.organization as string) ?? null,
+        specialty: (data.user.user_metadata?.specialty as string) ?? null,
+      });
+    }
   }
 
   redirect(next);

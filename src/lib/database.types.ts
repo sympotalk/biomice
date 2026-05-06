@@ -389,33 +389,42 @@ export type Database = {
       users_profile: {
         Row: {
           created_at: string
+          display_name: string | null
           id: string
           newsletter_opt_in: boolean
           notify_days: number[]
           notify_enabled: boolean
           organization: string | null
+          pharma_sub_type: string | null
+          phone: string | null
           specialty: string | null
           updated_at: string
           user_type: string | null
         }
         Insert: {
           created_at?: string
+          display_name?: string | null
           id: string
           newsletter_opt_in?: boolean
           notify_days?: number[]
           notify_enabled?: boolean
           organization?: string | null
+          pharma_sub_type?: string | null
+          phone?: string | null
           specialty?: string | null
           updated_at?: string
           user_type?: string | null
         }
         Update: {
           created_at?: string
+          display_name?: string | null
           id?: string
           newsletter_opt_in?: boolean
           notify_days?: number[]
           notify_enabled?: boolean
           organization?: string | null
+          pharma_sub_type?: string | null
+          phone?: string | null
           specialty?: string | null
           updated_at?: string
           user_type?: string | null

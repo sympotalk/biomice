@@ -13,9 +13,11 @@ const ADMIN_EMAILS = ["sympotalk@gmail.com"];
 type Props = {
   userEmail?: string | null;
   userType?: string | null;
+  displayName?: string | null;
+  organization?: string | null;
 };
 
-export function Header({ userEmail, userType }: Props) {
+export function Header({ userEmail, userType, displayName, organization }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const isAdmin = ADMIN_EMAILS.includes((userEmail ?? "").toLowerCase());
@@ -127,7 +129,12 @@ export function Header({ userEmail, userType }: Props) {
             style={{ gap: 8, alignItems: "center" }}
           >
             {userEmail ? (
-              <UserMenu email={userEmail} />
+              <UserMenu
+                email={userEmail}
+                userType={userType ?? undefined}
+                displayName={displayName ?? undefined}
+                organization={organization ?? undefined}
+              />
             ) : (
               <>
                 <Link href="/login">
@@ -344,6 +351,12 @@ export function Header({ userEmail, userType }: Props) {
                 <>
                   <div className="bm-drawer-section-title">내 계정</div>
                   <DrawerLink
+                    href="/profile"
+                    label="프로필 수정"
+                    sub="이름·소속·연락처 관리"
+                    onClick={() => setOpen(false)}
+                  />
+                  <DrawerLink
                     href="/mypage"
                     label="마이페이지"
                     sub="즐겨찾기·알림 설정"
@@ -356,7 +369,12 @@ export function Header({ userEmail, userType }: Props) {
             <div className="bm-drawer-footer">
               {userEmail ? (
                 <div style={{ fontSize: 13, color: "var(--bm-text-secondary)" }}>
-                  <UserMenu email={userEmail} />
+                  <UserMenu
+                    email={userEmail}
+                    userType={userType ?? undefined}
+                    displayName={displayName ?? undefined}
+                    organization={organization ?? undefined}
+                  />
                 </div>
               ) : (
                 <>
