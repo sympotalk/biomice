@@ -5,7 +5,8 @@
  * - 교육코드(KMA2026_MMDD_XXXXXX), 평점, 수강료, 교육 URL, 강의 시간표 등 포함
  * - 다일차 행사는 Day1/Day2 등 별도 row로 분리됨 (각 eduidx 독립)
  *
- * 목록: POST https://edu.kma.org/edu/schedule  { pageNo, start_dt, end_dt, ... }
+ * 목록: GET  https://edu.kma.org/edu/schedule?pageNo=N&start_dt=...&end_dt=...
+ *   (HTML form은 method=post이지만 $.goPage()가 실제로는 GET 쿼리스트링으로 제출 — POST는 405)
  * 상세: GET  https://edu.kma.org/edu/schedule_view?eduidx=N
  */
 import axios from "axios";
@@ -64,28 +65,26 @@ export type KmaEduDetail = {
 
 // ─── list page ────────────────────────────────────────────────────────────────
 
-/** POST 목록 페이지 한 장을 파싱해 eduidx 배열 반환 */
+/** GET 목록 페이지 한 장을 파싱해 eduidx 배열 반환 */
 export async function fetchListPage(
   page: number,
   startDate: string,
   endDate: string,
 ): Promise<KmaEduListItem[]> {
-  const params = new URLSearchParams({
-    pageNo: String(page),
-    start_dt: startDate,
-    end_dt: endDate,
-    sch_type: "1",
-    sch_txt: "",
-    sch_es: "",
-    s_smallcode_Nm: "",
-    s_place: "",
-    siidx: "",
-    s_escidx: "",
-    s_scode: "",
-  });
-
-  const res = await http.post<string>(LIST_URL, params.toString(), {
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  const res = await http.get<string>(LIST_URL, {
+    params: {
+      pageNo: page,
+      start_dt: startDate,
+      end_dt: endDate,
+      sch_type: "1",
+      sch_txt: "",
+      sch_es: "",
+      s_smallcode_Nm: "",
+      s_place: "",
+      siidx: "",
+      s_escidx: "",
+      s_scode: "",
+    },
     responseType: "text",
   });
 
@@ -129,22 +128,20 @@ export async function fetchListPage(
 
 /** 총 페이지 수 파악 */
 async function fetchTotalPages(startDate: string, endDate: string): Promise<number> {
-  const params = new URLSearchParams({
-    pageNo: "1",
-    start_dt: startDate,
-    end_dt: endDate,
-    sch_type: "1",
-    sch_txt: "",
-    sch_es: "",
-    s_smallcode_Nm: "",
-    s_place: "",
-    siidx: "",
-    s_escidx: "",
-    s_scode: "",
-  });
-
-  const res = await http.post<string>(LIST_URL, params.toString(), {
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  const res = await http.get<string>(LIST_URL, {
+    params: {
+      pageNo: 1,
+      start_dt: startDate,
+      end_dt: endDate,
+      sch_type: "1",
+      sch_txt: "",
+      sch_es: "",
+      s_smallcode_Nm: "",
+      s_place: "",
+      siidx: "",
+      s_escidx: "",
+      s_scode: "",
+    },
     responseType: "text",
   });
 

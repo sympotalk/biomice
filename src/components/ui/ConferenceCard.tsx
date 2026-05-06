@@ -17,6 +17,7 @@ export type ConferenceCardProps = {
   city?: string | null;
   specialty?: string | null;
   departments?: string[] | null;
+  cmeCreditsKr?: number | null;
   dDay?: number | null;
   featured?: boolean;
   registrationOpen?: boolean;
@@ -60,6 +61,7 @@ export function ConferenceCard({
   city,
   specialty,
   departments,
+  cmeCreditsKr,
   dDay,
   featured,
   registrationOpen,
@@ -249,6 +251,21 @@ export function ConferenceCard({
               }}
             >
               {dDay === 0 ? "D-DAY" : dDay > 0 ? `D-${dDay}` : `D+${Math.abs(dDay)}`}
+            </span>
+          )}
+          {cmeCreditsKr != null && (
+            <span
+              className="mono-num"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "3px 8px",
+                borderRadius: 4,
+                background: "var(--bm-success-subtle)",
+                color: "var(--bm-success)",
+              }}
+            >
+              {cmeCreditsKr}점
             </span>
           )}
         </div>

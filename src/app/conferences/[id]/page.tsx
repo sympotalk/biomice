@@ -437,10 +437,13 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
           </div>
 
           {/* CME 평점 / 마감 정보 */}
-          {(conf.cme_credits ||
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {(conf.cme_credits || (conf as any).cme_credits_kr ||
             conf.registration_deadline ||
             conf.early_bird_deadline ||
-            conf.abstract_deadline) && (
+            conf.abstract_deadline ||
+            (conf as any).fee ||
+            (conf as any).contact_info) && (
             <div
               style={{
                 background: "var(--bm-surface)",
@@ -464,7 +467,8 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               >
                 인정 점수 / 마감일
               </h3>
-              {conf.cme_credits && (
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {((conf as any).cme_credits_kr || conf.cme_credits) && (
                 <div
                   style={{
                     display: "flex",
@@ -475,24 +479,29 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                     borderRadius: 6,
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: "var(--bm-text-secondary)",
-                    }}
-                  >
-                    KMA 평점
+                  <span style={{ fontSize: 11, color: "var(--bm-text-secondary)" }}>
+                    KMA 연수평점
                   </span>
-                  <span
-                    className="mono-num"
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 800,
-                      color: "var(--bm-success)",
-                    }}
-                  >
-                    {conf.cme_credits} 점
+                  <span className="mono-num" style={{ fontSize: 14, fontWeight: 800, color: "var(--bm-success)" }}>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {(conf as any).cme_credits_kr ?? conf.cme_credits} 점
                   </span>
+                </div>
+              )}
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {(conf as any).fee && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", background: "var(--bm-bg-muted)", borderRadius: 6 }}>
+                  <span style={{ fontSize: 11, color: "var(--bm-text-secondary)" }}>수강료</span>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--bm-text-primary)" }}>{(conf as any).fee}</span>
+                </div>
+              )}
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {(conf as any).contact_info && (
+                <div style={{ padding: "8px 10px", background: "var(--bm-bg-muted)", borderRadius: 6 }}>
+                  <div style={{ fontSize: 11, color: "var(--bm-text-secondary)", marginBottom: 3 }}>교육문의</div>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <div style={{ fontSize: 12, color: "var(--bm-text-primary)", lineHeight: 1.6 }}>{(conf as any).contact_info}</div>
                 </div>
               )}
               {conf.abstract_deadline && (

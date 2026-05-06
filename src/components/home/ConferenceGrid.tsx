@@ -97,6 +97,7 @@ function CardFromRow({
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
       logoText={c.acronym || societyAbbr(c.society_name)}
       logoColor={specialtyColor(c.category)}
+      cmeCreditsKr={(c as unknown as { cme_credits_kr?: number | null }).cme_credits_kr}
       favorite={bookmarked}
     />
   );
