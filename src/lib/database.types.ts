@@ -17,6 +17,8 @@ export type Database = {
           advertiser_name: string | null
           click_count: number
           created_at: string
+          display_height: number
+          display_width: number
           end_date: string | null
           id: number
           image_url: string
@@ -32,6 +34,8 @@ export type Database = {
           advertiser_name?: string | null
           click_count?: number
           created_at?: string
+          display_height?: number
+          display_width?: number
           end_date?: string | null
           id?: number
           image_url: string
@@ -47,6 +51,8 @@ export type Database = {
           advertiser_name?: string | null
           click_count?: number
           created_at?: string
+          display_height?: number
+          display_width?: number
           end_date?: string | null
           id?: number
           image_url?: string

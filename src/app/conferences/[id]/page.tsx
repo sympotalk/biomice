@@ -16,6 +16,7 @@ import {
 } from "@/lib/queries";
 import { FavoriteHeart } from "@/components/ui/FavoriteHeart";
 import { StickyDetailCTA } from "@/components/conferences/StickyDetailCTA";
+import { AdSidebarStack } from "@/components/ui/AdSidebarStack";
 import {
   computeDDay,
   formatKoreanDate,
@@ -802,94 +803,8 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             </div>
           )}
 
-          {/* 우측 광고 — right_sidebar 슬롯 only */}
-          {sidebarBanners.length > 0 && (
-            <div style={{ marginTop: 4 }}>
-              {sidebarBanners.map((b) => (
-                <a
-                  key={b.id}
-                  href={b.link_url}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  style={{
-                    display: "block",
-                    textDecoration: "none",
-                    color: "inherit",
-                    marginBottom: 16,
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      background: "var(--bm-surface)",
-                      border: "1px solid var(--bm-border)",
-                      borderRadius: 10,
-                      overflow: "hidden",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                    }}
-                  >
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: 8,
-                        left: 8,
-                        zIndex: 2,
-                        fontSize: 9,
-                        fontWeight: 700,
-                        color: "var(--bm-text-tertiary)",
-                        background: "rgba(255,255,255,0.85)",
-                        padding: "2px 6px",
-                        borderRadius: 3,
-                        letterSpacing: 0.5,
-                      }}
-                    >
-                      AD
-                    </span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={b.image_url}
-                      alt={b.title ?? b.advertiser_name ?? "광고"}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        height: 320,
-                        objectFit: "cover",
-                        background: "var(--bm-bg-muted)",
-                      }}
-                    />
-                    <div style={{ padding: 12 }}>
-                      {b.advertiser_name && (
-                        <div
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 600,
-                            color: "var(--bm-text-tertiary)",
-                            marginBottom: 4,
-                          }}
-                        >
-                          {b.advertiser_name}
-                        </div>
-                      )}
-                      {b.title && (
-                        <div
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "var(--bm-text-primary)",
-                            lineHeight: 1.4,
-                            wordBreak: "keep-all",
-                          }}
-                        >
-                          {b.title}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
+          {/* 우측 광고 — right_sidebar slot, banner.display_width/height 동적 */}
+          <AdSidebarStack banners={sidebarBanners} />
         </aside>
       </div>
 

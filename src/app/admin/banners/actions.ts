@@ -14,6 +14,11 @@ const ALLOWED_MIME = [
 ];
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 
+function clampInt(n: number, min: number, max: number, fallback: number): number {
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(Math.max(Math.round(n), min), max);
+}
+
 export async function toggleBannerActive(id: number, currentActive: boolean) {
   await requireAdmin();
   const sb = createAdminClient();
@@ -119,6 +124,9 @@ export async function createBanner(_prev: unknown, formData: FormData) {
   const priority = Number(formData.get("priority") || 0);
   const file = formData.get("file") as File | null;
   const fallbackUrl = (formData.get("image_url") as string)?.trim() || null;
+  // 표시 사이즈 (admin이 admin UI에서 변경 가능, default 120×200)
+  const display_width = clampInt(Number(formData.get("display_width") || 120), 60, 400, 120);
+  const display_height = clampInt(Number(formData.get("display_height") || 200), 60, 800, 200);
 
   if (!link_url) {
     return { error: "링크 URL은 필수입니다." };
@@ -144,6 +152,8 @@ export async function createBanner(_prev: unknown, formData: FormData) {
     image_url: imageUrl,
     advertiser_name,
     priority,
+    display_width,
+    display_height,
     is_active: true,
   });
 
@@ -153,6 +163,30 @@ export async function createBanner(_prev: unknown, formData: FormData) {
   revalidatePath("/");
   revalidatePath("/conferences");
   return { error: null };
+}
+
+/**
+ * 기존 배너의 표시 사이즈(display_width/height)를 변경.
+ * 60~400px (width), 60~800px (height) 범위로 자동 clamp.
+ */
+export async function updateBannerSize(
+  id: number,
+  width: number,
+  height: number,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireAdmin();
+  const w = clampInt(width, 60, 400, 120);
+  const h = clampInt(height, 60, 800, 200);
+  const sb = createAdminClient();
+  const { error } = await sb
+    .from("banners")
+    .update({ display_width: w, display_height: h })
+    .eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/admin/banners");
+  revalidatePath("/");
+  revalidatePath("/conferences");
+  return { ok: true };
 }
 
 /**

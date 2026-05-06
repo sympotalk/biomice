@@ -340,6 +340,32 @@ export function BannerCreateForm() {
           />
         </div>
 
+        <div>
+          <label style={labelStyle}>표시 너비 (px)</label>
+          <input
+            name="display_width"
+            type="number"
+            defaultValue={120}
+            min={60}
+            max={400}
+            step={10}
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={labelStyle}>표시 높이 (px)</label>
+          <input
+            name="display_height"
+            type="number"
+            defaultValue={200}
+            min={60}
+            max={800}
+            step={10}
+            style={inputStyle}
+          />
+        </div>
+
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={labelStyle}>배너 제목 / 부제 (선택)</label>
           <input

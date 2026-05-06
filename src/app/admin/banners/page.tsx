@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/admin";
 import { createClient } from "@/lib/supabase/server";
 import { BannerActions } from "./BannerActions";
 import { BannerCreateForm } from "./BannerCreateForm";
+import { BannerSizeEditor } from "./BannerSizeEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -66,7 +67,7 @@ export default async function AdminBannersPage() {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--bm-border)", background: "var(--bm-bg-muted)" }}>
-              {["ID", "슬롯", "제목", "광고주", "우선순위", "상태", "액션"].map((h) => (
+              {["ID", "슬롯", "제목", "광고주", "사이즈 (px)", "우선순위", "상태", "액션"].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -122,6 +123,13 @@ export default async function AdminBannersPage() {
                 <td style={{ padding: "12px 16px", color: "var(--bm-text-secondary)" }}>
                   {b.advertiser_name ?? "—"}
                 </td>
+                <td style={{ padding: "12px 16px" }}>
+                  <BannerSizeEditor
+                    id={b.id}
+                    initialWidth={b.display_width ?? 120}
+                    initialHeight={b.display_height ?? 200}
+                  />
+                </td>
                 <td
                   style={{
                     padding: "12px 16px",
@@ -153,7 +161,7 @@ export default async function AdminBannersPage() {
             {(banners ?? []).length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   style={{
                     padding: "40px 16px",
                     textAlign: "center",
