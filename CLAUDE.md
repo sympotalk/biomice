@@ -59,6 +59,9 @@ ADMIN_EMAILS                          # 하드코딩 (Header.tsx)
 ```
 biomice/
 ├── .claude/
+│   ├── agents/            # 서브 에이전트 정의
+│   │   ├── claude-md-curator.md  # CLAUDE.md 자동 정리
+│   │   └── git-historian.md      # Git 이력 조회
 │   ├── commands/          # 슬래시 커맨드 정의
 │   ├── settings.json      # 권한 + 훅 (커밋됨)
 │   └── settings.local.json  # 로컬 사용자 권한 (gitignore)
@@ -138,6 +141,76 @@ npm run cf-typegen   # Cloudflare 환경 타입 재생성
 - KAMS 인정 어댑터 selector 미검증 — 실제 게시판 HTML 구조 매칭 후 튜닝 필요
 - `metadataBase` (`src/app/layout.tsx`)에 `https://biomice.kr` 잔존 — `https://biomice.xyz`로 정합성 확인
 - 학회 self-edit 권한 미구현 (Phase 3+ 예정)
+
+---
+
+## 🤖 모델 사용 전략
+
+| 작업 유형 | 모델 | 이유 |
+|---|---|---|
+| 일반 코딩 / 컴포넌트 수정 / 버그픽스 | **Sonnet (기본)** | 속도↑ 비용↓, 대부분의 작업 커버 |
+| 복잡한 아키텍처 설계 / 난이도 높은 디버깅 / 새 기능 설계 | **Opus** | 추론 깊이 필요 시 |
+| 빠른 조회 / 단순 텍스트 / 형식 변환 | **Haiku** | 초경량 단순 작업 |
+
+> **기본값 항상 Sonnet.** Opus는 명시적으로 필요할 때만.  
+> 자동 모드에서는: 새 기능 설계·난해한 버그·리팩터링 계획 → Opus, 그 외 → Sonnet.
+
+환경 변수 (불필요한 모델 호출 제한):
+```bash
+export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
+```
+
+---
+
+## 🔍 에이전트 활용
+
+### Git 이력 조회 → `@agent-git-historian`
+```
+@agent-git-historian 지난주 변경사항 요약해줘
+@agent-git-historian main에 머지된 최근 커밋 목록 보여줘
+@agent-git-historian src/lib/crawler/kams.ts 변경 이력 추적해줘
+```
+
+### CLAUDE.md 정리 → `@agent-claude-md-curator`
+다음 조건 충족 시 호출:
+- 변경 이력 **20줄 초과** / 파일 **150줄 초과** / 3개월 이상 이력 누적
+```
+@agent-claude-md-curator 이 CLAUDE.md를 정리해줘
+```
+
+---
+
+## 📋 세션 흐름
+
+```
+세션 시작
+  └─ /init-context  (이전 세션 + git log + ISSUES.md 자동 로드)
+  └─ 새 주제면 /clear, 이어가면 바로 시작
+
+작업 중
+  └─ Plan Mode로 계획 먼저 검토
+  └─ Git 조회 필요 → @agent-git-historian
+  └─ 토큰 80% → /compact (중요 맥락 보존)
+
+작업 완료
+  └─ /quick-save  (/save-session + /sync-github)
+  └─ 다음 작업과 무관하면 /clear
+  └─ CLAUDE.md 20줄+ 이력 → @agent-claude-md-curator
+```
+
+---
+
+## 🚫 .claudeignore 권장 패턴
+```
+node_modules/
+dist/
+.next/
+.open-next/
+*.log
+*.lock
+coverage/
+.env*
+```
 
 ---
 
