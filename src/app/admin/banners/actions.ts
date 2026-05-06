@@ -88,6 +88,28 @@ async function uploadFileToStorage(file: File): Promise<{
   return { ok: true, url: pub.publicUrl };
 }
 
+/**
+ * 파일을 Storage에 업로드하고 public URL을 반환한다.
+ * BannerCreateForm의 "업로드" 버튼이 호출 — 폼 제출과 분리된 별도 단계.
+ *
+ * 반환:
+ *   성공 → { url, name, size }
+ *   실패 → { error }
+ */
+export async function uploadBannerFile(
+  _prev: unknown,
+  formData: FormData,
+): Promise<{ url?: string; name?: string; size?: number; error?: string }> {
+  await requireAdmin();
+  const file = formData.get("file") as File | null;
+  if (!file || file.size === 0) {
+    return { error: "파일을 선택하세요." };
+  }
+  const result = await uploadFileToStorage(file);
+  if (!result.ok) return { error: result.error };
+  return { url: result.url, name: file.name, size: file.size };
+}
+
 export async function createBanner(_prev: unknown, formData: FormData) {
   await requireAdmin();
 
