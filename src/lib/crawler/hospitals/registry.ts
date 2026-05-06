@@ -1,5 +1,12 @@
 import type { HospitalAdapter } from "./types";
 
+// 어댑터 구현체 import
+import { amcAdapter }       from "./adapters/amc";
+import { snuhAdapter }      from "./adapters/snuh";
+import { smcAdapter }       from "./adapters/smc";
+import { severanceAdapter } from "./adapters/severance";
+import { bundangAdapter }   from "./adapters/bundang";
+
 /**
  * 병원 어댑터 레지스트리.
  * 실제 어댑터 구현은 adapters/ 하위에 위치하며, 여기서 import해 등록한다.
@@ -18,6 +25,13 @@ export function getAdapter(code: string): HospitalAdapter | null {
 export function listAdapters(): HospitalAdapter[] {
   return [...registry.values()];
 }
+
+// ── 어댑터 등록 (빌드 타임 side-effect) ─────────────────────────────────────
+registerAdapter(amcAdapter);
+registerAdapter(snuhAdapter);
+registerAdapter(smcAdapter);
+registerAdapter(severanceAdapter);
+registerAdapter(bundangAdapter);
 
 /** 전국 145개 병원 메타 (코드·이름·지역). 어댑터 미구현은 adapter=null. */
 export const HOSPITAL_META: { code: string; name: string; region: string }[] = [

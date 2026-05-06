@@ -9,6 +9,7 @@ const NAV = [
   { href: "/admin/banners", label: "배너 관리" },
   { href: "/admin/societies", label: "학회 관리" },
   { href: "/admin/crawlers", label: "크롤러" },
+  { href: "/admin/hospitals", label: "병원 크롤러" },
 ];
 
 export default async function AdminLayout({
