@@ -23,6 +23,8 @@ import {
   isRegistrationOpen,
 } from "@/lib/dates";
 import { societyAbbr, specialtyColor, resolveSpecialty } from "@/lib/society";
+import { getDepartmentColor } from "@/lib/departments";
+import type { LectureItem } from "@/lib/crawler/kams";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -175,7 +177,54 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                     {conf.category}
                   </span>
                 )}
+                {/* @ts-expect-error new column via migration */}
+                {conf.event_code && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      height: 24,
+                      padding: "0 10px",
+                      background: "#F0F4FF",
+                      color: "#3B5BDB",
+                      borderRadius: 4,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      fontFamily: "var(--font-mono, monospace)",
+                      letterSpacing: 0,
+                    }}
+                    title="KMA 교육코드"
+                  >
+                    {/* @ts-expect-error new column via migration */}
+                    교육코드 {conf.event_code}
+                  </span>
+                )}
               </div>
+              {/* 분야 배지 */}
+              {/* @ts-expect-error new column via migration */}
+              {Array.isArray(conf.departments) && (conf.departments as string[]).length > 0 && (
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10 }}>
+                  {/* @ts-expect-error new column via migration */}
+                  {(conf.departments as string[]).map((dept) => (
+                    <span
+                      key={dept}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        height: 22,
+                        padding: "0 10px",
+                        background: getDepartmentColor(dept),
+                        color: "#fff",
+                        borderRadius: 999,
+                        fontSize: 11,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {dept}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Title */}
               <h1
@@ -590,6 +639,48 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
               >
                 {conf.description}
               </p>
+            </div>
+          )}
+
+          {/* 프로그램 / 강의 목록 */}
+          {/* @ts-expect-error new column via migration */}
+          {Array.isArray(conf.lectures) && (conf.lectures as LectureItem[]).length > 0 && (
+            <div
+              style={{
+                background: "var(--bm-surface)",
+                border: "1px solid var(--bm-border)",
+                borderRadius: 8,
+                padding: 22,
+                overflowX: "auto",
+              }}
+            >
+              <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>
+                {/* @ts-expect-error new column via migration */}
+                프로그램 ({(conf.lectures as LectureItem[]).length}개 강의)
+              </h3>
+              <table className="bm-lecture-table">
+                <thead>
+                  <tr>
+                    <th>시간</th>
+                    <th>강의 제목</th>
+                    <th>연자</th>
+                    <th>소속</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* @ts-expect-error new column via migration */}
+                  {(conf.lectures as LectureItem[]).map((lec, i) => (
+                    <tr key={i}>
+                      <td className="mono-num" style={{ whiteSpace: "nowrap", color: "var(--bm-text-secondary)" }}>
+                        {lec.time}
+                      </td>
+                      <td style={{ fontWeight: 500 }}>{lec.title}</td>
+                      <td>{lec.lecturer}</td>
+                      <td style={{ color: "var(--bm-text-secondary)" }}>{lec.affiliation}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

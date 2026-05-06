@@ -81,10 +81,34 @@ export async function getCityCounts(): Promise<{ city: string; count: number }[]
     .slice(0, 12);
 }
 
+export async function getDepartmentCounts(): Promise<{ department: string; count: number }[]> {
+  const sb = await createServerClient();
+  // departments는 TEXT[] — unnest로 집계 불가 시 JS 측에서 flatten
+  const { data, error } = await sb
+    .from("conferences")
+    .select("departments")
+    .gte("start_date", today())
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .not("departments" as any, "is", null);
+  if (error) throw error;
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deps: string[] = (row as any).departments ?? [];
+    for (const dept of deps) {
+      if (dept) counts.set(dept, (counts.get(dept) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([department, count]) => ({ department, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
 export async function listConferences(params: {
   q?: string;
   category?: string;
   city?: string;
+  department?: string;
   dateFrom?: string; // YYYY-MM-DD
   dateTo?: string;   // YYYY-MM-DD
   featured?: boolean;
@@ -124,6 +148,10 @@ export async function listConferences(params: {
   }
   if (params.city) {
     query = query.eq("city", params.city);
+  }
+  if (params.department) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    query = (query as any).contains("departments", [params.department]);
   }
   if (params.featured) {
     query = query.eq("is_featured", true);

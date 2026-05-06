@@ -441,18 +441,53 @@ function Step3Pharma({
   company, setCompany,
   pharmaAreas, setPharmaAreas,
   pharmaJob, setPharmaJob,
+  pharmaSubType, setPharmaSubType,
 }: {
   company: string; setCompany: (v: string) => void;
   pharmaAreas: string[]; setPharmaAreas: (v: string[]) => void;
   pharmaJob: string; setPharmaJob: (v: string) => void;
+  pharmaSubType: string; setPharmaSubType: (v: string) => void;
 }) {
   const jobOpts = ["마케팅", "MSL", "영업", "학술", "기타"];
   const toggleArea = (a: string) =>
     setPharmaAreas(pharmaAreas.includes(a) ? pharmaAreas.filter((x) => x !== a) : [...pharmaAreas, a]);
 
+  const subTypes = [
+    { v: "pharma", label: "제약사", icon: "💊" },
+    { v: "device", label: "의료기기", icon: "🔬" },
+  ];
+
   return (
     <AuthCard title="회사 정보를 알려주세요" subtitle="담당 분야에 맞는 학술대회와 광고 기회를 안내해드려요.">
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <Field label="업종" required>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {subTypes.map(({ v, label, icon }) => {
+              const on = pharmaSubType === v;
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setPharmaSubType(v)}
+                  style={{
+                    height: 44,
+                    borderRadius: 6,
+                    border: `1.5px solid ${on ? "var(--bm-primary)" : "var(--bm-border)"}`,
+                    background: on ? "var(--bm-primary-subtle)" : "var(--bm-bg)",
+                    color: on ? "var(--bm-primary)" : "var(--bm-text-secondary)",
+                    fontSize: 13, fontWeight: on ? 700 : 500,
+                    cursor: "pointer", fontFamily: "inherit",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  }}
+                >
+                  <span>{icon}</span>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </Field>
+
         <Field label="회사명" required>
           <TextInput name="organization" value={company} onChange={setCompany} placeholder="예: 한국화이자제약" />
         </Field>
@@ -623,6 +658,7 @@ export function SignupForm() {
   // Step 3 — pharma
   const [pharmaAreas, setPharmaAreas] = useState<string[]>([]);
   const [pharmaJob, setPharmaJob] = useState("");
+  const [pharmaSubType, setPharmaSubType] = useState("pharma");
 
   // Step 4
   const [agree, setAgree] = useState<AgreeState>({ tos: false, privacy: false, marketing: false, notify: true });
@@ -662,6 +698,7 @@ export function SignupForm() {
         fd.set("name", name);
         fd.set("notify_enabled", String(agree.notify));
         fd.set("newsletter_opt_in", String(agree.marketing));
+        if (role === "pharma") fd.set("pharma_sub_type", pharmaSubType);
         const result = await signupAction(null, fd);
         if (result?.error) setError(result.error);
       });
@@ -688,7 +725,12 @@ export function SignupForm() {
         <Step3Doctor specialty={specialty} setSpecialty={setSpecialty} organization={organization} setOrganization={setOrganization} rank={rank} setRank={setRank} />
       )}
       {step === 3 && role !== "doctor" && (
-        <Step3Pharma company={organization} setCompany={setOrganization} pharmaAreas={pharmaAreas} setPharmaAreas={setPharmaAreas} pharmaJob={pharmaJob} setPharmaJob={setPharmaJob} />
+        <Step3Pharma
+          company={organization} setCompany={setOrganization}
+          pharmaAreas={pharmaAreas} setPharmaAreas={setPharmaAreas}
+          pharmaJob={pharmaJob} setPharmaJob={setPharmaJob}
+          pharmaSubType={pharmaSubType} setPharmaSubType={setPharmaSubType}
+        />
       )}
       {step === 4 && <Step4 agree={agree} setAgree={setAgree} />}
 

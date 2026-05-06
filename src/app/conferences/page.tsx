@@ -14,9 +14,11 @@ import {
   listConferencesForMonth,
   getSpecialtyCounts,
   getCityCounts,
+  getDepartmentCounts,
   getMyBookmarkIds,
   listSidebarBanners,
 } from "@/lib/queries";
+import { DepartmentFilterTabs } from "@/components/conferences/DepartmentFilterTabs";
 import { formatISO, addMonths } from "date-fns";
 import Link from "next/link";
 
@@ -28,6 +30,7 @@ type SearchParams = Promise<{
   q?: string;
   category?: string;
   city?: string;
+  department?: string;
   date?: string;
   page?: string;
   view?: string;
@@ -70,6 +73,7 @@ export default async function ConferencesListPage({
   const q = sp.q?.trim() || undefined;
   const category = sp.category?.trim() || undefined;
   const city = sp.city?.trim() || undefined;
+  const department = sp.department?.trim() || undefined;
   const date = sp.date?.trim() || undefined;
   const isCalendar = sp.view === "calendar";
   const isFeatured = sp.view === "featured";
@@ -95,7 +99,7 @@ export default async function ConferencesListPage({
     dateTo = fmt(plus7);
   }
 
-  const [{ rows, total }, categories, cities, sidebarBanners, bookmarkedIds] =
+  const [{ rows, total }, categories, cities, departmentCounts, sidebarBanners, bookmarkedIds] =
     await Promise.all([
       isCalendar
         ? { rows: [], total: 0 }
@@ -103,6 +107,7 @@ export default async function ConferencesListPage({
             q,
             category,
             city,
+            department,
             dateFrom,
             dateTo,
             featured: isFeatured,
@@ -112,6 +117,7 @@ export default async function ConferencesListPage({
           }),
       getSpecialtyCounts(),
       getCityCounts(),
+      getDepartmentCounts(),
       listSidebarBanners(2),
       getMyBookmarkIds(),
     ]);
@@ -135,6 +141,8 @@ export default async function ConferencesListPage({
     ? `${category} 학술대회`
     : city
     ? `${city} 학술대회`
+    : department
+    ? `${department} 학술대회`
     : isCalendar
     ? "캘린더"
     : "전체 학술대회";
@@ -238,6 +246,13 @@ export default async function ConferencesListPage({
                 width: "100%",
               }}
             >
+              {/* 분야별 필터 탭 (departments 데이터가 있을 때만 표시) */}
+              {!isCalendar && departmentCounts.length > 0 && (
+                <div style={{ marginBottom: 16 }}>
+                  <DepartmentFilterTabs counts={departmentCounts} />
+                </div>
+              )}
+
               {/* 모바일용 sticky 검색·필터 toolbar + 바텀시트 */}
               <MobileFilterToolbar
                 categories={categories}

@@ -42,6 +42,9 @@ export async function signupAction(
   const userType = String(formData.get("user_type") ?? "other");
   const organization = String(formData.get("organization") ?? "").trim();
   const specialty = String(formData.get("specialty") ?? "").trim();
+  const pharmaSubType = userType === "pharma"
+    ? String(formData.get("pharma_sub_type") ?? "pharma")
+    : null;
 
   if (!email || !password) {
     return { error: "이메일과 비밀번호는 필수입니다." };
@@ -70,10 +73,12 @@ export async function signupAction(
 
   // Create profile row if we have a user id and session (no email confirmation required).
   if (data.user && data.session) {
-    await sb.from("users_profile").upsert(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (sb as any).from("users_profile").upsert(
       {
         id: data.user.id,
         user_type: userType,
+        pharma_sub_type: pharmaSubType,
         organization: organization || null,
         specialty: specialty || null,
       },

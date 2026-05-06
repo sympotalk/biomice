@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CalendarIcon, PinIcon } from "./Icon";
 import { FavoriteHeart } from "./FavoriteHeart";
+import { getDepartmentColor } from "@/lib/departments";
 
 export type ConferenceCardRowProps = {
   id: number;
@@ -13,6 +14,7 @@ export type ConferenceCardRowProps = {
   venue?: string | null;
   city?: string | null;
   specialty?: string | null;
+  departments?: string[] | null;
   dDay?: number | null;
   featured?: boolean;
   registrationOpen?: boolean;
@@ -67,6 +69,7 @@ export function ConferenceCardRow({
   venue,
   city,
   specialty,
+  departments,
   dDay,
   featured,
   favorite,
@@ -405,6 +408,41 @@ export function ConferenceCardRow({
             >
               {venueLine}
             </span>
+          </div>
+        )}
+
+        {/* 분야 배지 (max 3 + +N) */}
+        {departments && departments.length > 0 && (
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+            {departments.slice(0, 3).map((dept) => (
+              <span
+                key={dept}
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  padding: "1px 7px",
+                  borderRadius: 999,
+                  background: getDepartmentColor(dept),
+                  color: "#fff",
+                }}
+              >
+                {dept}
+              </span>
+            ))}
+            {departments.length > 3 && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  padding: "1px 7px",
+                  borderRadius: 999,
+                  background: "var(--bm-bg-muted)",
+                  color: "var(--bm-text-secondary)",
+                }}
+              >
+                +{departments.length - 3}
+              </span>
+            )}
           </div>
         )}
       </div>

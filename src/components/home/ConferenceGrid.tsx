@@ -91,6 +91,7 @@ function CardFromRow({
       venue={c.venue}
       city={c.city}
       specialty={c.category}
+      departments={(c as unknown as { departments?: string[] }).departments}
       dDay={computeDDay(c.start_date)}
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}
@@ -118,6 +119,7 @@ function RowFromConf({
       venue={c.venue}
       city={c.city}
       specialty={c.category}
+      departments={(c as unknown as { departments?: string[] }).departments}
       dDay={computeDDay(c.start_date)}
       featured={c.is_featured}
       registrationOpen={isRegistrationOpen(c.start_date, c.registration_url)}

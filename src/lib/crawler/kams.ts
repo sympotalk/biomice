@@ -11,7 +11,6 @@ const DETAIL_URL = (id: string) =>
 const UA =
   "Mozilla/5.0 (compatible; biomice-crawler/0.1; +https://biomice.kr)";
 
-// Light rate-limit helper so we don't hammer KAMS.
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export type KamsRow = {
@@ -25,9 +24,19 @@ export type KamsRow = {
   detailUrl: string;
 };
 
+export type LectureItem = {
+  time: string;
+  title: string;
+  lecturer: string;
+  affiliation: string;
+};
+
 export type KamsDetail = {
   registrationUrl?: string;
   description?: string;
+  eventCode?: string;
+  kmaCategory?: string;
+  lectures?: LectureItem[];
 };
 
 /** Convert "서울 COEX" → city "서울", venue "COEX". Best-effort only. */
@@ -87,6 +96,72 @@ function parseDateRange(raw: string): { start: string; end?: string } | null {
   };
 }
 
+/**
+ * Parse KMA 교육코드 from detail page HTML.
+ * Patterns: "교육코드 : KMA2026_0309_169525" or data-code attribute.
+ */
+function parseEventCode(html: string): string | null {
+  const match = html.match(/교육코드\s*[：:]\s*([A-Z0-9_]+)/);
+  if (match?.[1]) return match[1];
+  const dataMatch = html.match(/data-code=["']([A-Z0-9_]+)["']/);
+  return dataMatch?.[1] ?? null;
+}
+
+/**
+ * Parse KMA 인정과목 (specialty categories).
+ * Pattern: "인정과목 : 내과, 외과, 소아청소년과..."
+ */
+function parseKmaCategory(html: string): string | null {
+  const match = html.match(/인정과목\s*[：:]\s*([^<\n\r]+)/);
+  return match?.[1]?.trim() ?? null;
+}
+
+/**
+ * Parse program/lecture table from detail page.
+ * Table rows: 시간 | 강의제목 | 강연자 | 소속
+ */
+function parseLectures(html: string): LectureItem[] {
+  const $ = cheerio.load(html);
+  const lectures: LectureItem[] = [];
+
+  // Try common selectors for program tables
+  const tableSelectors = [
+    ".program_table tr",
+    ".schedule_table tr",
+    ".board_view table tr",
+    ".view_content table tr",
+    "#view_content table tr",
+    "table tr",
+  ];
+
+  for (const sel of tableSelectors) {
+    const rows = $(sel);
+    if (rows.length < 2) continue;
+
+    let found = false;
+    rows.each((_, tr) => {
+      const tds = $(tr).find("td");
+      if (tds.length < 3) return;
+
+      const time = $(tds[0]).text().trim();
+      const title = $(tds[1]).text().trim();
+      const lecturer = $(tds[2]).text().trim();
+      const affiliation = tds.length >= 4 ? $(tds[3]).text().trim() : "";
+
+      // Skip header-like rows or empty rows
+      if (!title || title.length < 2) return;
+      if (/시간|강의|제목|강연자|연자|좌장/i.test(title) && !lecturer) return;
+
+      lectures.push({ time, title, lecturer, affiliation });
+      found = true;
+    });
+
+    if (found) break;
+  }
+
+  return lectures;
+}
+
 export async function fetchListPage(
   year: number,
   page: number,
@@ -142,7 +217,7 @@ export async function fetchListPage(
   return rows;
 }
 
-/** Fetch extra detail (registration URL, description) for a single row. */
+/** Fetch extra detail (registration URL, description, event code, categories, lectures) for a single row. */
 export async function fetchDetail(kamsId: string): Promise<KamsDetail> {
   try {
     const res = await axios.get<string>(DETAIL_URL(kamsId), {
@@ -151,6 +226,7 @@ export async function fetchDetail(kamsId: string): Promise<KamsDetail> {
       responseType: "text",
     });
     const $ = cheerio.load(res.data);
+    const html = res.data;
 
     // Registration links — pick the first external http(s) link inside the body
     // that looks like it's not back to KAMS.
@@ -182,7 +258,17 @@ export async function fetchDetail(kamsId: string): Promise<KamsDetail> {
         .trim()
         .slice(0, 2000) || undefined;
 
-    return { registrationUrl, description };
+    const eventCode = parseEventCode(html) ?? undefined;
+    const kmaCategory = parseKmaCategory(html) ?? undefined;
+    const lectures = parseLectures(html);
+
+    return {
+      registrationUrl,
+      description,
+      eventCode,
+      kmaCategory,
+      lectures: lectures.length > 0 ? lectures : undefined,
+    };
   } catch {
     return {};
   }
@@ -203,7 +289,8 @@ export async function crawlKams(
   const maxPages = opts.maxPages ?? 5;
   const delay = opts.delayMs ?? 1500;
 
-  const out: ConferenceInsert[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const out: any[] = [];
   for (let page = 1; page <= maxPages; page++) {
     const rows = await fetchListPage(year, page);
     if (rows.length === 0) break;
@@ -215,6 +302,15 @@ export async function crawlKams(
         detail = await fetchDetail(row.kamsId);
         await sleep(delay);
       }
+
+      const departments =
+        detail.kmaCategory
+          ? detail.kmaCategory
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : null;
+
       out.push({
         kams_id: row.kamsId,
         society_name: row.societyName,
@@ -227,6 +323,10 @@ export async function crawlKams(
         detail_url: row.detailUrl,
         registration_url: detail.registrationUrl ?? null,
         description: detail.description ?? null,
+        event_code: detail.eventCode ?? null,
+        kma_category: detail.kmaCategory ?? null,
+        departments: departments,
+        lectures: detail.lectures ? JSON.stringify(detail.lectures) : null,
         is_deleted: false,
       });
     }

@@ -12,12 +12,14 @@ const ADMIN_EMAILS = ["sympotalk@gmail.com"];
 
 type Props = {
   userEmail?: string | null;
+  userType?: string | null;
 };
 
-export function Header({ userEmail }: Props) {
+export function Header({ userEmail, userType }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const isAdmin = ADMIN_EMAILS.includes((userEmail ?? "").toLowerCase());
+  const isPharma = userType === "pharma";
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -86,6 +88,13 @@ export function Header({ userEmail }: Props) {
             <Link href="/pharma" style={{ ...navLinkStyle, color: "var(--bm-accent)" }}>
               제약사
             </Link>
+            {isPharma && (
+              <>
+                <Link href="/browse" style={navLinkStyle}>의료진 검색</Link>
+                <Link href="/memos" style={navLinkStyle}>메모</Link>
+                <Link href="/team" style={navLinkStyle}>팀</Link>
+              </>
+            )}
             {isAdmin && (
               <Link
                 href="/admin"
@@ -294,6 +303,30 @@ export function Header({ userEmail }: Props) {
                 sub="월별 일정 한눈에"
                 onClick={() => setOpen(false)}
               />
+
+              {isPharma && (
+                <>
+                  <div className="bm-drawer-section-title">MR 전용</div>
+                  <DrawerLink
+                    href="/browse"
+                    label="의료진 검색"
+                    sub="전국 병원 의사 검색·진료시간"
+                    onClick={() => setOpen(false)}
+                  />
+                  <DrawerLink
+                    href="/memos"
+                    label="메모·방문록"
+                    sub="방문 기록·미팅 노트"
+                    onClick={() => setOpen(false)}
+                  />
+                  <DrawerLink
+                    href="/team"
+                    label="팀 관리"
+                    sub="공유 핀·팀 메모 피드"
+                    onClick={() => setOpen(false)}
+                  />
+                </>
+              )}
 
               {isAdmin && (
                 <>

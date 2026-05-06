@@ -14,7 +14,7 @@ export const metadata = { title: "내 페이지 · BioMICE" };
 
 const USER_TYPE_LABEL: Record<string, string> = {
   doctor: "의사",
-  pharma: "제약사",
+  pharma: "제약사·의료기기",
   other: "기타",
 };
 
@@ -164,6 +164,62 @@ export default async function MyPage() {
           enabled={me.profile?.notify_enabled ?? true}
           days={(me.profile?.notify_days as number[] | null) ?? [7, 1]}
         />
+
+        {/* Pharma 전용 MR 기능 빠른 접근 */}
+        {me.profile?.user_type === "pharma" && (
+          <section
+            style={{
+              marginTop: 16,
+              background: "var(--bm-surface)",
+              border: "1px solid var(--bm-accent-border, var(--bm-border))",
+              borderRadius: 12,
+              padding: 16,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: "var(--bm-text-tertiary)",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                marginBottom: 12,
+              }}
+            >
+              MR 전용 기능
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+              {[
+                { href: "/browse", icon: "🔍", label: "의료진 검색" },
+                { href: "/memos", icon: "📝", label: "메모·방문록" },
+                { href: "/team", icon: "👥", label: "팀 관리" },
+              ].map(({ href, icon, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    padding: "14px 8px",
+                    borderRadius: 8,
+                    background: "var(--bm-bg-muted)",
+                    textDecoration: "none",
+                    color: "var(--bm-text-primary)",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    transition: "background .12s",
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>{icon}</span>
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Bookmarks */}
         <section style={{ marginTop: 20 }}>

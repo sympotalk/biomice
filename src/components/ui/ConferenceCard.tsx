@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CalendarIcon, PinIcon } from "./Icon";
 import { FavoriteHeart } from "./FavoriteHeart";
 import { radius } from "@/lib/tokens";
+import { getDepartmentColor } from "@/lib/departments";
 
 export type ConferenceCardProps = {
   id: number;
@@ -15,6 +16,7 @@ export type ConferenceCardProps = {
   venue?: string | null;
   city?: string | null;
   specialty?: string | null;
+  departments?: string[] | null;
   dDay?: number | null;
   featured?: boolean;
   registrationOpen?: boolean;
@@ -57,6 +59,7 @@ export function ConferenceCard({
   venue,
   city,
   specialty,
+  departments,
   dDay,
   featured,
   registrationOpen,
@@ -249,6 +252,41 @@ export function ConferenceCard({
             </span>
           )}
         </div>
+
+        {/* 분야 배지 (max 3 + +N) */}
+        {departments && departments.length > 0 && (
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            {departments.slice(0, 3).map((dept) => (
+              <span
+                key={dept}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: getDepartmentColor(dept),
+                  color: "#fff",
+                }}
+              >
+                {dept}
+              </span>
+            ))}
+            {departments.length > 3 && (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: "var(--bm-bg-muted)",
+                  color: "var(--bm-text-secondary)",
+                }}
+              >
+                +{departments.length - 3}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* 제목 — 큼직하게 */}
         <h3
