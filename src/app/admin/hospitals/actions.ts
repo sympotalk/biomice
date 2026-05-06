@@ -6,8 +6,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CrawlHospitalResult = {
   ok: boolean;
+  dryRun: boolean;
   code: string;
   hospitalName: string;
+  fetched: number;
   inserted: number;
   updated: number;
   skipped: number;
@@ -32,8 +34,10 @@ export async function crawlHospitalAction(
   if (!adapter) {
     return {
       ok: false,
+      dryRun,
       code,
       hospitalName,
+      fetched: 0,
       inserted: 0,
       updated: 0,
       skipped: 0,
@@ -53,9 +57,11 @@ export async function crawlHospitalAction(
     if (dryRun) {
       return {
         ok: true,
+        dryRun: true,
         code,
         hospitalName,
-        inserted: doctors.length,
+        fetched: doctors.length,
+        inserted: 0,
         updated: 0,
         skipped: 0,
         durationMs: Date.now() - t0,
@@ -85,8 +91,10 @@ export async function crawlHospitalAction(
     if (!hospitalId) {
       return {
         ok: false,
+        dryRun: false,
         code,
         hospitalName,
+        fetched: doctors.length,
         inserted: 0,
         updated: 0,
         skipped,
@@ -149,8 +157,10 @@ export async function crawlHospitalAction(
 
     return {
       ok: true,
+      dryRun: false,
       code,
       hospitalName,
+      fetched: doctors.length,
       inserted,
       updated,
       skipped,
@@ -159,8 +169,10 @@ export async function crawlHospitalAction(
   } catch (e) {
     return {
       ok: false,
+      dryRun,
       code,
       hospitalName,
+      fetched: inserted + updated + skipped,
       inserted,
       updated,
       skipped,

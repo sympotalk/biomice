@@ -127,7 +127,11 @@ export async function runKmaEduCrawlerAction(
 
     return { ok: true, dryRun: false, fetched: rows.length, inserted, updated, skipped, durationMs: Date.now() - t0 };
   } catch (e) {
-    return { ok: false, dryRun, fetched: 0, inserted: 0, updated: 0, skipped: 0, error: (e as Error).message, durationMs: Date.now() - t0 };
+    const msg = (e as Error).message ?? String(e);
+    const friendlyMsg = /522|524/.test(msg)
+      ? `edu.kma.org 서버 일시 오류(${msg.match(/\d{3}/)?.[0] ?? "5xx"}) — 잠시 후 재시도하거나 maxPages를 줄여보세요`
+      : msg;
+    return { ok: false, dryRun, fetched: 0, inserted: 0, updated: 0, skipped: 0, error: friendlyMsg, durationMs: Date.now() - t0 };
   }
 }
 

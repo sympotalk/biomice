@@ -208,40 +208,58 @@ export function HospitalCrawlerPanel({ hospitals }: Props) {
 }
 
 function ResultRow({ result: r }: { result: CrawlHospitalResult }) {
+  // 상태 분류: 실패 / 수집0건(선택자 불일치) / 이미최신 / 신규+갱신
+  let borderColor = "var(--bm-border)";
+  let bgColor = "var(--bm-surface)";
+  if (!r.ok) { borderColor = "#FCA5A5"; bgColor = "#FEF2F2"; }
+  else if (r.fetched === 0) { borderColor = "#FCD34D"; bgColor = "#FFFBEB"; }
+
   return (
     <div
       style={{
         padding: "10px 14px",
         borderRadius: 8,
-        border: `1px solid ${r.ok ? "var(--bm-border)" : "#FCA5A5"}`,
-        background: r.ok ? "var(--bm-surface)" : "#FEF2F2",
+        border: `1px solid ${borderColor}`,
+        background: bgColor,
         fontSize: 13,
       }}
     >
       <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{ fontWeight: 700 }}>{r.hospitalName}</span>
-        {r.ok ? (
+        {!r.ok ? (
           <>
-            <Tag color="#2D9D5A" bg="#E8F9EE">
-              +{r.inserted}건 신규
-            </Tag>
+            <Tag color="#E05151" bg="#FEF2F2">실패</Tag>
+            <span style={{ color: "#E05151", fontSize: 12 }}>{r.error}</span>
+          </>
+        ) : r.dryRun ? (
+          <>
+            <Tag color="#1A73E8" bg="#E8F4FD">dry-run</Tag>
+            {r.fetched > 0 ? (
+              <Tag color="#2D9D5A" bg="#E8F9EE">{r.fetched}건 수집됨</Tag>
+            ) : (
+              <Tag color="#B45309" bg="#FEF3C7">⚠ 0건 — 선택자 확인 필요</Tag>
+            )}
+          </>
+        ) : r.fetched === 0 ? (
+          <Tag color="#B45309" bg="#FEF3C7">⚠ 수집 0건 — 선택자 불일치 가능성</Tag>
+        ) : r.inserted === 0 && r.updated === 0 ? (
+          <Tag color="#6B7280" bg="#F3F4F6">✓ 이미 최신 ({r.fetched}명 확인)</Tag>
+        ) : (
+          <>
+            {r.inserted > 0 && (
+              <Tag color="#2D9D5A" bg="#E8F9EE">+{r.inserted}건 신규</Tag>
+            )}
             {r.updated > 0 && (
-              <Tag color="#1A73E8" bg="#E8F4FD">
-                ~{r.updated}건 갱신
-              </Tag>
+              <Tag color="#1A73E8" bg="#E8F4FD">~{r.updated}건 갱신</Tag>
             )}
             {r.skipped > 0 && (
-              <Tag color="#888" bg="#F0F0F0">
-                {r.skipped}건 스킵
-              </Tag>
+              <Tag color="#888" bg="#F0F0F0">{r.skipped}건 스킵</Tag>
             )}
-            <span style={{ fontSize: 11, color: "var(--bm-text-tertiary)" }}>
-              {(r.durationMs / 1000).toFixed(1)}s
-            </span>
           </>
-        ) : (
-          <span style={{ color: "#E05151", fontSize: 12 }}>{r.error}</span>
         )}
+        <span style={{ fontSize: 11, color: "var(--bm-text-tertiary)", marginLeft: "auto" }}>
+          {(r.durationMs / 1000).toFixed(1)}s
+        </span>
       </div>
     </div>
   );

@@ -24,6 +24,18 @@ const http = axios.create({
   headers: { "User-Agent": UA },
 });
 
+// 522 (Cloudflare 연결 타임아웃) 발생 시 최대 2회 재시도
+http.interceptors.response.use(undefined, async (err) => {
+  const status = err?.response?.status;
+  const retryCount: number = (err.config as { _retry?: number })?._retry ?? 0;
+  if ((status === 522 || status === 524) && retryCount < 2) {
+    (err.config as { _retry?: number })._retry = retryCount + 1;
+    await sleep(2000 * (retryCount + 1));
+    return http.request(err.config);
+  }
+  return Promise.reject(err);
+});
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // ─── types ────────────────────────────────────────────────────────────────────
