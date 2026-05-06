@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
-import { runCrawlerAction } from "./actions";
+import { runCrawlerAction, runKmaEduCrawlerAction } from "./actions";
+import type { KmaEduCrawlActionResult } from "./actions";
 
 type AdapterInfo = {
   key: string;
@@ -24,7 +25,26 @@ export function CrawlerActions({ adapters }: { adapters: AdapterInfo[] }) {
   const [running, setRunning] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, CrawlResult | null>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [kmaEduResult, setKmaEduResult] = useState<KmaEduCrawlActionResult | null>(null);
+  const [kmaEduMaxPages, setKmaEduMaxPages] = useState("10");
   const [, startTransition] = useTransition();
+
+  function triggerKmaEdu(dryRun: boolean) {
+    setGlobalError(null);
+    const key = dryRun ? "kmaedu-dry" : "kmaedu-live";
+    setRunning(key);
+    startTransition(async () => {
+      try {
+        const res = await runKmaEduCrawlerAction(dryRun, { maxPages: Number(kmaEduMaxPages) || 10 });
+        setKmaEduResult(res);
+        if (!res.ok && res.error) setGlobalError(res.error);
+      } catch (e) {
+        setGlobalError((e as Error).message);
+      } finally {
+        setRunning(null);
+      }
+    });
+  }
 
   function trigger(sourceKey: string | null, dryRun: boolean) {
     setGlobalError(null);
@@ -126,6 +146,107 @@ export function CrawlerActions({ adapters }: { adapters: AdapterInfo[] }) {
           </div>
         </section>
       )}
+
+      {/* KMA 연수교육센터 크롤러 */}
+      <section
+        style={{
+          background: "var(--bm-surface)",
+          border: "2px solid var(--bm-primary)",
+          borderRadius: 8,
+          padding: 20,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
+            KMA 연수교육센터 크롤러
+          </h3>
+          <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: "#E8F9EE", color: "#2D9D5A" }}>
+            PRIMARY
+          </span>
+        </div>
+        <p style={{ margin: "0 0 12px", fontSize: 12, color: "var(--bm-text-secondary)", lineHeight: 1.6 }}>
+          <strong>edu.kma.org</strong> — 대한의사협회 공식 CME 플랫폼.
+          교육코드·평점·수강료·강의 시간표·교육문의 등 KAMS보다 훨씬 풍부한 데이터.
+          오늘 이후 ~1년치 이벤트를 크롤합니다.
+        </p>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+          <label style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+            최대 페이지 수 (페이지당 15건):
+            <input
+              type="number"
+              min={1}
+              max={200}
+              value={kmaEduMaxPages}
+              onChange={(e) => setKmaEduMaxPages(e.target.value)}
+              style={{ width: 64, marginLeft: 4, padding: "2px 6px", border: "1px solid var(--bm-border)", borderRadius: 4, fontSize: 12, fontFamily: "var(--font-mono)" }}
+            />
+          </label>
+          <span style={{ fontSize: 11, color: "var(--bm-text-tertiary)" }}>
+            ≈ {(Number(kmaEduMaxPages) || 0) * 15}건 예상 · 상세 크롤 포함 시 페이지당 ~30초
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => triggerKmaEdu(true)}
+            disabled={running !== null}
+          >
+            {running === "kmaedu-dry" ? "검증 중..." : "Dry-run (건수 확인)"}
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              if (!confirm("KMA edu 크롤 후 DB에 upsert합니다. 진행할까요?")) return;
+              triggerKmaEdu(false);
+            }}
+            disabled={running !== null}
+          >
+            {running === "kmaedu-live" ? "크롤 중..." : "실행 (DB 저장)"}
+          </Button>
+        </div>
+
+        {kmaEduResult && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: "10px 14px",
+              borderRadius: 6,
+              border: `1px solid ${kmaEduResult.ok ? "var(--bm-border)" : "#FCA5A5"}`,
+              background: kmaEduResult.ok ? "var(--bm-bg-muted)" : "#FEF2F2",
+              fontSize: 12,
+              lineHeight: 1.6,
+            }}
+          >
+            {kmaEduResult.ok ? (
+              <>
+                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700 }}>
+                  fetch: {kmaEduResult.fetched}건
+                </span>
+                {!kmaEduResult.dryRun && (
+                  <>
+                    {" · "}
+                    <span style={{ color: "#2D9D5A" }}>+{kmaEduResult.inserted} 신규</span>
+                    {" · "}
+                    <span style={{ color: "#1A73E8" }}>~{kmaEduResult.updated} 갱신</span>
+                    {kmaEduResult.skipped > 0 && <>{" · "}{kmaEduResult.skipped} 스킵</>}
+                  </>
+                )}
+                {" · "}
+                <span style={{ color: "var(--bm-text-tertiary)" }}>
+                  {(kmaEduResult.durationMs / 1000).toFixed(1)}s
+                </span>
+                {kmaEduResult.dryRun && (
+                  <span style={{ marginLeft: 8, color: "var(--bm-text-tertiary)" }}>(dry-run — DB 미저장)</span>
+                )}
+              </>
+            ) : (
+              <span style={{ color: "#E05151" }}>오류: {kmaEduResult.error}</span>
+            )}
+          </div>
+        )}
+      </section>
 
       {/* 전체 실행 */}
       <section
