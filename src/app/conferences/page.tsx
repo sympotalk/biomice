@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ConferenceGrid } from "@/components/home/ConferenceGrid";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { AdBanner } from "@/components/ui/AdBanner";
+import { AdSidebarStack } from "@/components/ui/AdSidebarStack";
 import { ListSidebar } from "@/components/conferences/ListSidebar";
 import { MobileFilterToolbar } from "@/components/conferences/MobileFilterToolbar";
 import { PaginationClient } from "@/components/conferences/PaginationClient";
@@ -14,8 +14,8 @@ import {
   listConferencesForMonth,
   getSpecialtyCounts,
   getCityCounts,
-  getBannerForSlot,
   getMyBookmarkIds,
+  listSidebarBanners,
 } from "@/lib/queries";
 import { formatISO, addMonths } from "date-fns";
 import Link from "next/link";
@@ -95,7 +95,7 @@ export default async function ConferencesListPage({
     dateTo = fmt(plus7);
   }
 
-  const [{ rows, total }, categories, cities, sideBanner, bookmarkedIds] =
+  const [{ rows, total }, categories, cities, sidebarBanners, bookmarkedIds] =
     await Promise.all([
       isCalendar
         ? { rows: [], total: 0 }
@@ -112,7 +112,7 @@ export default async function ConferencesListPage({
           }),
       getSpecialtyCounts(),
       getCityCounts(),
-      getBannerForSlot("list_sidebar"),
+      listSidebarBanners(2),
       getMyBookmarkIds(),
     ]);
 
@@ -274,18 +274,8 @@ export default async function ConferencesListPage({
               )}
             </div>
 
-            {/* 배너 광고 (사이드바 오른쪽) */}
-            {sideBanner && (
-              <aside style={{ position: "sticky", top: 88, flexShrink: 0 }}>
-                <AdBanner
-                  size="square"
-                  sponsor={sideBanner.advertiser_name ?? undefined}
-                  title={sideBanner.title ?? "Sponsor"}
-                  cta="자세히"
-                  href={sideBanner.link_url}
-                />
-              </aside>
-            )}
+            {/* 우측 광고 사이드바 — right_sidebar slot */}
+            <AdSidebarStack banners={sidebarBanners} />
           </div>
         )}
       </main>

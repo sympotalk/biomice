@@ -6,9 +6,13 @@ import { BannerCreateForm } from "./BannerCreateForm";
 export const dynamic = "force-dynamic";
 
 const SLOT_LABELS: Record<string, string> = {
-  list_sidebar: "목록 사이드바",
-  detail_top: "상세 상단",
-  home_hero: "홈 히어로",
+  right_sidebar: "우측 사이드바",
+  // legacy — 비활성 처리됨
+  main_top: "(deprecated) 메인 상단",
+  list_sidebar: "(deprecated) 목록 사이드바",
+  detail_bottom: "(deprecated) 상세 하단",
+  detail_top: "(deprecated) 상세 상단",
+  home_hero: "(deprecated) 홈 히어로",
 };
 
 export default async function AdminBannersPage() {
@@ -33,8 +37,20 @@ export default async function AdminBannersPage() {
       >
         배너 관리
       </h1>
-      <p style={{ margin: "0 0 32px", fontSize: 13, color: "var(--bm-text-secondary)" }}>
-        총 {banners?.length ?? 0}개
+      <p
+        style={{
+          margin: "0 0 24px",
+          fontSize: 13,
+          color: "var(--bm-text-secondary)",
+        }}
+      >
+        총 {banners?.length ?? 0}개 ·{" "}
+        <strong style={{ color: "var(--bm-success)" }}>
+          right_sidebar
+        </strong>{" "}
+        슬롯만 사이트에 노출됨. 기존{" "}
+        <code>main_top / list_sidebar / detail_bottom</code> 등은 deprecated
+        (비활성 처리, 데이터는 보존).
       </p>
 
       {/* 배너 목록 */}

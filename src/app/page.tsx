@@ -3,7 +3,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { ConferenceGrid } from "@/components/home/ConferenceGrid";
-import { AdBanner } from "@/components/ui/AdBanner";
 import { AdSidebarStack } from "@/components/ui/AdSidebarStack";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
@@ -11,7 +10,6 @@ import {
   listThisWeekConferences,
   listUpcomingConferences,
   getSpecialtyCounts,
-  getBannerForSlot,
   getMyBookmarkIds,
   listSidebarBanners,
 } from "@/lib/queries";
@@ -25,7 +23,6 @@ export default async function HomePage() {
     thisWeek,
     upcoming,
     specialtyCounts,
-    banner,
     sidebarBanners,
     bookmarkedIds,
   ] = await Promise.all([
@@ -33,7 +30,6 @@ export default async function HomePage() {
     listThisWeekConferences(8),
     listUpcomingConferences(12),
     getSpecialtyCounts(),
-    getBannerForSlot("main_top"),
     listSidebarBanners(3),
     getMyBookmarkIds(),
   ]);
@@ -49,19 +45,6 @@ export default async function HomePage() {
         <div className="bm-home-layout">
           {/* ── 좌측 콘텐츠 ─────────────────────────────────────────── */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Main top banner */}
-            {banner && (
-              <div style={{ padding: "24px 0" }}>
-                <AdBanner
-                  size="wide"
-                  sponsor={banner.advertiser_name ?? undefined}
-                  title={banner.title ?? "Advertisement"}
-                  cta="자세히 보기"
-                  href={banner.link_url}
-                />
-              </div>
-            )}
-
             {/* Featured */}
             {featured.length > 0 && (
               <section className="bm-section">

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { HeaderServer as Header } from "@/components/layout/HeaderServer";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/Button";
-import { AdBanner } from "@/components/ui/AdBanner";
 import {
   DDayBadge,
   FeaturedBadge,
@@ -12,7 +11,6 @@ import {
 import { ExternalIcon } from "@/components/ui/Icon";
 import {
   getConference,
-  getBannerForSlot,
   getMyBookmarkIds,
   listSidebarBanners,
 } from "@/lib/queries";
@@ -51,9 +49,8 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
   const numId = Number(id);
   if (!Number.isFinite(numId)) notFound();
 
-  const [conf, sideBanner, sidebarBanners, bookmarkedIds] = await Promise.all([
+  const [conf, sidebarBanners, bookmarkedIds] = await Promise.all([
     getConference(numId),
-    getBannerForSlot("detail_bottom"),
     listSidebarBanners(2),
     getMyBookmarkIds(),
   ]);
@@ -805,8 +802,8 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
             </div>
           )}
 
-          {/* 우측 광고 — monews 스타일 stack (right_sidebar 슬롯) */}
-          {sidebarBanners.length > 0 ? (
+          {/* 우측 광고 — right_sidebar 슬롯 only */}
+          {sidebarBanners.length > 0 && (
             <div style={{ marginTop: 4 }}>
               {sidebarBanners.map((b) => (
                 <a
@@ -892,16 +889,6 @@ export default async function ConferenceDetailPage({ params }: { params: Params 
                 </a>
               ))}
             </div>
-          ) : (
-            sideBanner && (
-              <AdBanner
-                size="square"
-                sponsor={sideBanner.advertiser_name ?? undefined}
-                title={sideBanner.title ?? "Advertisement"}
-                cta="자세히 보기"
-                href={sideBanner.link_url}
-              />
-            )
           )}
         </aside>
       </div>
