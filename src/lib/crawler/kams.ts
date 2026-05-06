@@ -326,7 +326,7 @@ export async function crawlKams(
         event_code: detail.eventCode ?? null,
         kma_category: detail.kmaCategory ?? null,
         departments: departments,
-        lectures: detail.lectures ? JSON.stringify(detail.lectures) : null,
+        lectures: detail.lectures?.length ? detail.lectures : null,
         is_deleted: false,
       });
     }

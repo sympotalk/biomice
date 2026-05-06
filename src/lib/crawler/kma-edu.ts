@@ -364,7 +364,7 @@ export async function crawlKmaEdu(opts: KmaEduCrawlOptions = {}): Promise<any[]>
         departments: departments && departments.length > 0 ? departments : null,
         description: detail?.notes ?? null,
         cme_credits_kr: detail?.creditPoints ?? item.creditPoints ?? null,
-        lectures: lectures ? JSON.stringify(lectures) : null,
+        lectures: lectures ?? null,
         fee: detail?.fee ?? null,
         contact_info: detail?.contactInfo ?? null,
         keywords: detail?.keywords ?? null,

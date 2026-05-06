@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/Button";
 import { NotifySettings } from "./NotifySettings";
 import { getMyProfile, getMyBookmarkedConferences } from "@/lib/queries";
 import { logoutAction } from "@/app/login/actions";
+import { getMyDoctors } from "@/app/actions/myDoctors";
+import { getMyMemos } from "@/app/actions/memos";
+import { getMyTeams } from "@/app/actions/teams";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "내 페이지 · BioMICE" };
@@ -22,8 +25,16 @@ export default async function MyPage() {
   const me = await getMyProfile();
   if (!me) redirect("/login?next=/mypage");
 
-  const bookmarked = await getMyBookmarkedConferences();
+  const isPharma = me.profile?.user_type === "pharma";
+
+  const [bookmarked, myDoctors, recentMemos, myTeams] = await Promise.all([
+    getMyBookmarkedConferences(),
+    isPharma ? getMyDoctors() : Promise.resolve([]),
+    isPharma ? getMyMemos({}) : Promise.resolve([]),
+    isPharma ? getMyTeams() : Promise.resolve([]),
+  ]);
   const bookmarkedIds = new Set(bookmarked.map((c) => c.id));
+  const recentMemos3 = recentMemos.slice(0, 3);
 
   // 임박한 즐겨찾기 (D-7 이내)
   const today = new Date();
@@ -165,8 +176,8 @@ export default async function MyPage() {
           days={(me.profile?.notify_days as number[] | null) ?? [7, 1]}
         />
 
-        {/* Pharma 전용 MR 기능 빠른 접근 */}
-        {me.profile?.user_type === "pharma" && (
+        {/* Pharma 전용 MR 기능 대시보드 */}
+        {isPharma && (
           <section
             style={{
               marginTop: 16,
@@ -174,6 +185,9 @@ export default async function MyPage() {
               border: "1px solid var(--bm-accent-border, var(--bm-border))",
               borderRadius: 12,
               padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
             }}
           >
             <div
@@ -183,17 +197,18 @@ export default async function MyPage() {
                 color: "var(--bm-text-tertiary)",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
-                marginBottom: 12,
               }}
             >
               MR 전용 기능
             </div>
+
+            {/* 빠른 접근 버튼 */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
               {[
-                { href: "/browse", icon: "🔍", label: "의료진 검색" },
-                { href: "/memos", icon: "📝", label: "메모·방문록" },
-                { href: "/team", icon: "👥", label: "팀 관리" },
-              ].map(({ href, icon, label }) => (
+                { href: "/browse", icon: "🔍", label: "의료진 검색", count: myDoctors.length > 0 ? `${myDoctors.length}명` : null },
+                { href: "/memos", icon: "📝", label: "메모·방문록", count: recentMemos.length > 0 ? `${recentMemos.length}건` : null },
+                { href: "/team", icon: "👥", label: "팀 관리", count: myTeams.length > 0 ? `${myTeams.length}팀` : null },
+              ].map(({ href, icon, label, count }) => (
                 <Link
                   key={href}
                   href={href}
@@ -202,7 +217,7 @@ export default async function MyPage() {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 6,
+                    gap: 4,
                     padding: "14px 8px",
                     borderRadius: 8,
                     background: "var(--bm-bg-muted)",
@@ -210,14 +225,176 @@ export default async function MyPage() {
                     color: "var(--bm-text-primary)",
                     fontSize: 12,
                     fontWeight: 600,
-                    transition: "background .12s",
                   }}
                 >
                   <span style={{ fontSize: 22 }}>{icon}</span>
                   {label}
+                  {count && (
+                    <span style={{ fontSize: 10, color: "var(--bm-primary)", fontWeight: 700 }}>
+                      {count}
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>
+
+            {/* 내 의료진 요약 */}
+            {myDoctors.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>내 의료진</span>
+                  <Link href="/my-doctors" style={{ fontSize: 11, color: "var(--bm-primary)", textDecoration: "none" }}>
+                    전체 {myDoctors.length}명 →
+                  </Link>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {myDoctors.slice(0, 3).map((d) => (
+                    <div
+                      key={d.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "8px 10px",
+                        background: "var(--bm-bg-muted)",
+                        borderRadius: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 16,
+                          background: "var(--bm-primary-subtle)",
+                          color: "var(--bm-primary)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 700,
+                          fontSize: 13,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {(d.hospital_doctors?.name ?? "?").slice(0, 1)}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bm-text-primary)" }}>
+                          {d.hospital_doctors?.name}
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--bm-text-tertiary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {d.hospital_doctors?.hospitals?.name} · {d.hospital_doctors?.department}
+                        </div>
+                      </div>
+                      {d.visit_grade && (
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            padding: "2px 6px",
+                            borderRadius: 4,
+                            background: "var(--bm-primary)",
+                            color: "#fff",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {d.visit_grade}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 최근 메모 */}
+            {recentMemos3.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>최근 메모</span>
+                  <Link href="/memos" style={{ fontSize: 11, color: "var(--bm-primary)", textDecoration: "none" }}>
+                    전체 보기 →
+                  </Link>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {recentMemos3.map((m) => (
+                    <Link
+                      key={m.id}
+                      href={`/memos/${m.id}`}
+                      style={{
+                        padding: "8px 10px",
+                        background: "var(--bm-bg-muted)",
+                        borderRadius: 6,
+                        textDecoration: "none",
+                        color: "inherit",
+                        display: "block",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: "var(--bm-text-tertiary)", fontFamily: "var(--font-mono)" }}>
+                          {m.visit_date}
+                        </span>
+                        {m.hospital_doctors && (
+                          <span style={{ fontSize: 10, color: "var(--bm-text-secondary)" }}>
+                            {m.hospital_doctors.name} ({m.hospital_doctors.department})
+                          </span>
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "var(--bm-text-primary)",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {m.content}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 팀 요약 */}
+            {myTeams.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>내 팀</span>
+                  <Link href="/team" style={{ fontSize: 11, color: "var(--bm-primary)", textDecoration: "none" }}>
+                    팀 관리 →
+                  </Link>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {myTeams.map((t) => (
+                    <Link
+                      key={t.id}
+                      href={`/team/${t.id}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "8px 10px",
+                        background: "var(--bm-bg-muted)",
+                        borderRadius: 6,
+                        textDecoration: "none",
+                        color: "inherit",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{t.name}</div>
+                        <div style={{ fontSize: 11, color: "var(--bm-text-tertiary)" }}>
+                          {t.memberCount}명 · {t.role === "owner" ? "팀장" : "멤버"}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: t.role === "owner" ? "var(--bm-primary)" : "var(--bm-bg)", color: t.role === "owner" ? "#fff" : "var(--bm-text-secondary)", border: t.role === "owner" ? "none" : "1px solid var(--bm-border)" }}>
+                        {t.role === "owner" ? "팀장" : "멤버"}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         )}
 
