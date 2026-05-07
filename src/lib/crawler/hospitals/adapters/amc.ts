@@ -1,12 +1,12 @@
 /**
  * 서울아산병원 (AMC) 어댑터
- * 의사 목록: https://www.amc.seoul.kr/asan/depts/deptList.do
- * 개인 상세: https://www.amc.seoul.kr/asan/depts/deptDrDetail.do?doctorId=<id>
  *
- * 구조:
- *   1. /asan/departments/list.do → 진료과 목록
- *   2. 진료과별 /asan/departments/doctors.do?deptCd=<code> → 의사 목록
- *   3. 의사 상세 페이지 → 진료시간 (schedule)
+ * ⚠️  현재 미동작: amc.seoul.kr 는 외부 IP 접근을 차단함 ("요청하신 페이지는 차단 되었습니다")
+ *    - DevTools로 실제 AJAX API 엔드포인트를 직접 확인 후 재작성 필요
+ *    - 아래 dept 코드·선택자는 모두 추정값이므로 실제 매칭 안됨
+ *    - fetchDoctors()는 즉시 빈 배열을 반환해 불필요한 타임아웃을 방지
+ *
+ * TODO: AMC 내부망 또는 VPN에서 DevTools 네트워크 탭으로 실제 API 캡처 필요
  */
 import type { HospitalAdapter, DoctorRaw, ScheduleRaw } from "../types";
 import {
