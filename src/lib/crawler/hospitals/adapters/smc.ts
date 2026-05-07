@@ -1,202 +1,143 @@
 /**
  * 삼성서울병원 (SMC) 어댑터
- * 진료과 목록: https://www.samsunghospital.com/home/reservation/deptSearch.do
- * 의사 목록: https://www.samsunghospital.com/home/reservation/deptDrSearch.do
  *
- * SMC는 AJAX 기반 검색. deptCd 파라미터로 진료과 코드를 보내
- * JSON 또는 HTML 응답을 받는다.
+ * 실제 동작 확인된 구조:
+ *   초기: POST /home/reservation/doctorDetailInfo.do (SW=검색어, HTML 응답)
+ *   페이징: GET /home/reservation/doctorInfoLists.do?cPage=N&SW=검색어&SUB_DEPT_YN=A
+ *
+ * HTML 카드 선택자:
+ *   article.card-content → .text-blue (이름), .treatment-parts (진료과),
+ *                          a[href*="DR_NO"] (의사번호), .card-content-body p (전문분야)
+ *
+ * 전략: 주요 진료과 키워드 검색 후 DR_NO 기준 중복 제거
  */
-import type { HospitalAdapter, DoctorRaw, ScheduleRaw } from "../types";
-import {
-  fetchHtml,
-  postJson,
-  sleep,
-  extractText,
-  toAbsolute,
-  todayIso,
-} from "../base";
+import axios from "axios";
+import * as cheerio from "cheerio";
+import type { HospitalAdapter, DoctorRaw } from "../types";
 
 const BASE = "https://www.samsunghospital.com";
+const DETAIL_URL = `${BASE}/home/reservation/doctorDetailInfo.do`;
+const LIST_URL = `${BASE}/home/reservation/doctorInfoLists.do`;
+const UA = "Mozilla/5.0 (compatible; biomice-crawler/0.1; +https://biomice.kr)";
+const PAGE_SIZE = 6; // SMC 페이지당 의사 수 (확인됨)
 
-// 삼성서울병원 진료과 코드 목록
-const DEPT_CODES = [
-  "C001", // 내과
-  "C002", // 소화기내과
-  "C003", // 심장내과
-  "C004", // 호흡기내과
-  "C005", // 신장내과
-  "C006", // 혈액종양내과
-  "C007", // 내분비대사내과
-  "C008", // 류마티스내과
-  "C009", // 감염내과
-  "C010", // 외과
-  "C011", // 간담도외과
-  "C012", // 위장관외과
-  "C013", // 유방외과
-  "C014", // 대장항문외과
-  "C015", // 흉부외과
-  "C016", // 정형외과
-  "C017", // 신경외과
-  "C018", // 성형외과
-  "C019", // 비뇨의학과
-  "C020", // 산부인과
-  "C021", // 소아청소년과
-  "C022", // 신경과
-  "C023", // 정신건강의학과
-  "C024", // 안과
-  "C025", // 이비인후과
-  "C026", // 피부과
-  "C027", // 재활의학과
-  "C028", // 가정의학과
+// 전체 의사 커버를 위한 광범위 검색 키워드
+// "과" 단독으로는 진료과명(내과·외과 등)에 모두 매칭되어 대부분의 의사를 커버
+const SEARCH_TERMS = [
+  "내과", "외과", "신경과", "정형외과", "흉부외과", "성형외과",
+  "마취통증", "산부인과", "소아청소년과", "안과", "이비인후과",
+  "비뇨의학과", "피부과", "영상의학과", "재활의학과", "정신건강",
+  "가정의학과", "응급의학과", "핵의학과", "진단검사", "방사선",
 ];
 
-type SmcDoctorJson = {
-  drNm?: string;
-  drNo?: string;
-  deptNm?: string;
-  specialty?: string;
-  position?: string;
-  profileUrl?: string;
-};
+const http = axios.create({
+  timeout: 20_000,
+  headers: { "User-Agent": UA, Referer: BASE },
+});
 
-async function fetchDoctorsByDept(deptCd: string): Promise<DoctorRaw[]> {
-  // SMC JSON API 시도
-  const jsonUrl = `${BASE}/home/reservation/deptDrSearch.do`;
-  const jsonResult = await postJson<{ list?: SmcDoctorJson[]; doctorList?: SmcDoctorJson[] }>(
-    jsonUrl,
-    { deptCd, pageIndex: 1, pageSize: 100 },
-  );
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  if (jsonResult) {
-    const list = jsonResult.list ?? jsonResult.doctorList ?? [];
-    if (list.length > 0) {
-      return list.map((d) => ({
-        externalId: String(d.drNo ?? `smc-${deptCd}-${d.drNm ?? ""}`),
-        name: d.drNm ?? "",
-        department: d.deptNm ?? "미분류",
-        specialty: d.specialty || undefined,
-        position: d.position || undefined,
-        profileUrl: d.profileUrl ? toAbsolute(BASE, d.profileUrl) : undefined,
-      })).filter((d) => d.name.length >= 2);
-    }
-  }
-
-  // HTML fallback
-  const $ = await fetchHtml(`${BASE}/home/reservation/deptDrSearch.do`, { deptCd });
-  if (!$) return [];
-
+function parseDoctors(html: string, seen: Set<string>): DoctorRaw[] {
+  const $ = cheerio.load(html);
   const doctors: DoctorRaw[] = [];
-  const selectors = [
-    ".doctor-list li",
-    ".dr_list li",
-    ".physician-item",
-    ".doc-item",
-    ".staff-card",
-  ];
 
-  for (const sel of selectors) {
-    if ($(sel).length === 0) continue;
-    $(sel).each((_, el) => {
-      const name = extractText($, $(el).find("strong, .name, h4").first()[0] ?? null);
-      if (!name || name.length < 2) return;
-      const department = $(el).find(".dept, .major").text().trim() || "미분류";
-      const specialty = $(el).find(".specialty, .field").text().trim() || undefined;
-      const href = $(el).find("a[href]").attr("href");
-      const params = new URLSearchParams((href ?? "").split("?")[1] ?? "");
-      const drNo = params.get("drNo") ?? params.get("doctorNo");
-      doctors.push({
-        externalId: String(drNo ?? `smc-${deptCd}-${name}`),
-        name,
-        department,
-        specialty,
-        profileUrl: toAbsolute(BASE, href),
-      });
+  $("article.card-content").each((_, card) => {
+    const name = $(card).find(".text-blue").text().trim();
+    const dept = $(card)
+      .find(".treatment-parts")
+      .text()
+      .replace(/[[\]]/g, "")
+      .trim();
+    const drNo = $(card)
+      .find('a[href*="DR_NO"]')
+      .attr("href")
+      ?.match(/DR_NO=(\d+)/)?.[1];
+    const specialty = $(card).find(".card-content-body p").text().trim();
+    const position = $(card)
+      .find("h3.card-content-title span:nth-child(2)")
+      .text()
+      .trim();
+
+    if (!name || name.length < 2 || !drNo) return;
+    if (seen.has(drNo)) return;
+    seen.add(drNo);
+
+    doctors.push({
+      externalId: drNo,
+      name,
+      department: dept || "미분류",
+      specialty: specialty || undefined,
+      position: position || undefined,
+      profileUrl: `${BASE}/home/reservation/common/doctorProfile.do?DR_NO=${drNo}`,
     });
-    if (doctors.length > 0) break;
-  }
+  });
 
   return doctors;
 }
 
-async function fetchSchedule(drNo: string): Promise<ScheduleRaw | null> {
-  // SMC 스케줄 API
-  type ScheduleRow = { day?: string; dayNm?: string; amYn: string; pmYn: string };
-  type ScheduleApiRes = {
-    scheduleList?: ScheduleRow[];
-    weekSchedule?: ScheduleRow[];
-  };
+async function fetchBySearchTerm(
+  sw: string,
+  seen: Set<string>,
+): Promise<DoctorRaw[]> {
+  const collected: DoctorRaw[] = [];
 
-  const jsonResult = await postJson<ScheduleApiRes>(
-    `${BASE}/home/reservation/drSchedule.do`,
-    { drNo },
-  );
-
-  if (jsonResult) {
-    const list = jsonResult.scheduleList ?? jsonResult.weekSchedule ?? [];
-    if (list.length > 0) {
-      const weekdays: Record<string, ("AM" | "PM" | "휴진")[]> = {};
-      for (const row of list) {
-        const day = row.day ?? row.dayNm;
-        if (!day) continue;
-        const sessions: ("AM" | "PM" | "휴진")[] = [];
-        if (row.amYn === "Y") sessions.push("AM");
-        if (row.pmYn === "Y") sessions.push("PM");
-        if (sessions.length === 0) sessions.push("휴진");
-        weekdays[day] = sessions;
-      }
-      return { weekdays, updatedAt: todayIso() };
-    }
-  }
-
-  // HTML fallback
-  const $ = await fetchHtml(`${BASE}/home/reservation/drDetail.do`, { drNo });
-  if (!$) return null;
-
-  const weekdays: Record<string, ("AM" | "PM" | "휴진")[]> = {};
-  const DAYS = ["월", "화", "수", "목", "금", "토"];
-
-  $("table tr").each((_, tr) => {
-    const cells = $(tr).find("th, td");
-    const dayText = extractText($, cells[0]).replace(/\s/g, "");
-    if (!DAYS.includes(dayText)) return;
-    const sessions: ("AM" | "PM" | "휴진")[] = [];
-    cells.each((i, cell) => {
-      if (i === 0) return;
-      const t = extractText($, cell);
-      if (/오전|AM|진료/i.test(t)) sessions.push("AM");
-      else if (/오후|PM/i.test(t)) sessions.push("PM");
-      else if (/휴진|X/i.test(t)) sessions.push("휴진");
-    });
-    if (sessions.length > 0) weekdays[dayText] = sessions;
+  // 1st page: POST
+  const initBody = new URLSearchParams({ SW: sw });
+  const initRes = await http.post<string>(DETAIL_URL, initBody.toString(), {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    responseType: "text",
   });
 
-  return { weekdays, updatedAt: todayIso() };
+  const firstPage = parseDoctors(initRes.data, seen);
+  collected.push(...firstPage);
+
+  // 총 건수 추출
+  const totalMatch = initRes.data.match(/총\s*<[^>]*>(\d+)/);
+  const total = totalMatch ? parseInt(totalMatch[1]) : firstPage.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  // 2nd page 이후: GET AJAX
+  for (let page = 2; page <= Math.min(totalPages, 100); page++) {
+    const res = await http.get<string>(LIST_URL, {
+      params: {
+        cPage: page,
+        SW: sw,
+        SUB_DEPT_YN: "A",
+        DP_CODE: "",
+        DP_TYPE: "",
+        _: Date.now(),
+      },
+      responseType: "text",
+    });
+    const pageDoctors = parseDoctors(res.data, seen);
+    collected.push(...pageDoctors);
+    if (pageDoctors.length === 0) break;
+    await sleep(300);
+  }
+
+  return collected;
 }
 
 export const smcAdapter: HospitalAdapter = {
   code: "SMC",
   name: "삼성서울병원",
   region: "서울",
-  doctorListUrl: `${BASE}/home/reservation/deptSearch.do`,
+  doctorListUrl: DETAIL_URL,
 
   async fetchDoctors(): Promise<DoctorRaw[]> {
     const all: DoctorRaw[] = [];
     const seen = new Set<string>();
 
-    for (const deptCd of DEPT_CODES) {
-      const doctors = await fetchDoctorsByDept(deptCd);
-      for (const doc of doctors) {
-        if (!seen.has(doc.externalId)) {
-          seen.add(doc.externalId);
-          all.push(doc);
-        }
-      }
-      await sleep(1000);
+    for (const term of SEARCH_TERMS) {
+      const doctors = await fetchBySearchTerm(term, seen);
+      all.push(...doctors);
+      await sleep(500);
     }
+
     return all;
   },
 
-  async fetchDoctorSchedule(externalId: string): Promise<ScheduleRaw | null> {
-    return fetchSchedule(externalId);
+  async fetchDoctorSchedule() {
+    return null;
   },
 };
